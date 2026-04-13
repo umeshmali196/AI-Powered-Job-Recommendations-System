@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="h2 mb-1">Saved Jobs</h1>
+            <p class="text-muted mb-0">Your shortlist of bookmarked opportunities.</p>
+        </div>
+        <a href="{% url 'job_list' %}" class="btn btn-outline-primary">Browse Jobs</a>
+    </div>
+
+    <div class="row g-4">
+        {% for saved in saved_jobs %}
+            <div class="col-md-6 col-xl-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4 d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                            <div>
+                                <h2 class="h5 mb-1">{{ saved.job.title }}</h2>
+                                <p class="text-muted mb-0">{{ saved.job.company }} · {{ saved.job.location }}</p>
+                            </div>
+                            <span class="badge text-bg-light border">{{ saved.application_status|default:"Not applied" }}</span>
+                        </div>
+
+                        <p class="text-muted small">{{ saved.job.description|truncatewords:22 }}</p>
+
+                        <div class="d-flex flex-wrap gap-2 mt-auto">
+                            <a href="{% url 'job_detail' saved.job.id %}" class="btn btn-primary btn-sm">View Job</a>
+                            <form method="post" action="{% url 'toggle_save_job_legacy' saved.job.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="next" value="{% url 'saved_jobs' %}">
+                                <button type="submit" class="btn btn-outline-secondary btn-sm">Remove</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-5 text-center text-muted">
+                        You have not saved any jobs yet.
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

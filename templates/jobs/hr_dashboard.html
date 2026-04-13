@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    {% if messages %}
+        <div class="mb-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="h2 mb-1">HR Review Dashboard</h1>
+            <p class="text-muted mb-0">Review candidates, schedule interviews, and take final decisions from one SaaS-style board.</p>
+        </div>
+        <form method="get" class="d-flex gap-2">
+            <select name="status" class="form-select">
+                <option value="">All statuses</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if active_status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button class="btn btn-primary" type="submit">Filter</button>
+        </form>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="small text-muted text-uppercase fw-semibold mb-1">Total Applications</div><div class="h3 mb-0">{{ metrics.total }}</div></div></div></div>
+        <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="small text-muted text-uppercase fw-semibold mb-1">Under Review</div><div class="h3 mb-0">{{ metrics.under_review }}</div></div></div></div>
+        <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="small text-muted text-uppercase fw-semibold mb-1">Interview Scheduled</div><div class="h3 mb-0">{{ metrics.interview_scheduled }}</div></div></div></div>
+        <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="small text-muted text-uppercase fw-semibold mb-1">Average Match</div><div class="h3 mb-0">{{ metrics.average_match|floatformat:0 }}%</div></div></div></div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 mb-3">Application Pipeline</h2>
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Candidate</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Resume</th>
+                                    <th>Interview</th>
+                                    <th>Final</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for app in applications %}
+                                    <tr>
+                                        <td>
+                                            <div class="fw-semibold">{{ app.full_name }}</div>
+                                            <div class="text-muted small">{{ app.email }}</div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-semibold">{{ app.job.title }}</div>
+                                            <div class="text-muted small">{{ app.job.company }}</div>
+                                        </td>
+                                        <td><span class="badge text-bg-light border">{{ app.status }}</span></td>
+                                        <td>{{ app.resume_score|floatformat:0 }}%</td>
+                                        <td>{{ app.interview_score|floatformat:0 }}%</td>
+                                        <td>{{ app.final_score|floatformat:0 }}%</td>
+                                        <td class="text-end">
+                                            <a href="{% url 'hr_application_review' app.id %}" class="btn btn-sm btn-primary">Review</a>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr><td colspan="7" class="text-center text-muted py-4">No applications found for this filter.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 mb-3">Top Candidates</h2>
+                    {% for app in top_candidates %}
+                        <div class="rounded-4 border p-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-start gap-3">
+                                <div>
+                                    <div class="fw-semibold">{{ app.full_name }}</div>
+                                    <div class="text-muted small">{{ app.job.title }}</div>
+                                </div>
+                                <span class="badge text-bg-primary">{{ app.final_score|floatformat:0 }}%</span>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2 mt-3">
+                                <span class="badge text-bg-light border">Resume {{ app.resume_score|floatformat:0 }}%</span>
+                                <span class="badge text-bg-light border">Interview {{ app.interview_score|floatformat:0 }}%</span>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="rounded-4 bg-light p-4 text-center text-muted">Top candidates will appear here as interviews are completed.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

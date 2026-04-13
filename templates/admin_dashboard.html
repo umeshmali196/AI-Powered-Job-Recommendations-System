@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    :root {
+        --admin-bg: #f8fafc;
+        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    body { background-color: var(--admin-bg); }
+    
+    .dashboard-header { margin-bottom: 2rem; }
+    .page-title { font-weight: 800; color: #1e293b; letter-spacing: -0.02em; }
+    
+    .job-section { margin-bottom: 3rem; }
+    .job-title-card {
+        background: white;
+        border: none;
+        border-left: 5px solid #6366f1;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 1.5rem;
+    }
+
+    .applicant-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        transition: transform 0.2s, box-shadow 0.2s;
+        overflow: hidden;
+    }
+    .applicant-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .skill-tag {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 600;
+        display: inline-block;
+        margin-right: 5px;
+    }
+    .skill-matched { background: #ecfdf5; color: #059669; }
+    .skill-missing { background: #fef2f2; color: #dc2626; }
+    
+    .btn-action {
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="dashboard-header d-flex justify-content-between align-items-end">
+        <div>
+            <span class="badge bg-indigo-soft text-primary mb-2" style="background: #eef2ff;">Management Console</span>
+            <h2 class="page-title">Recruitment Intelligence</h2>
+        </div>
+        <div class="text-end">
+            <p class="text-muted small mb-0">Live Applications: <strong>{{ jobs.items|length }} active roles</strong></p>
+        </div>
+    </div>
+
+    {% for job, data in jobs.items %}
+    <div class="job-section">
+        <div class="job-title-card d-flex justify-content-between align-items-center">
+            <div>
+                <h4 class="fw-bold mb-1">{{ job }}</h4>
+                <p class="text-muted small mb-0">Internal Talent Pipeline</p>
+            </div>
+            <div class="text-center">
+                <div class="h4 fw-bold text-primary mb-0">{{ data.average|floatformat:1 }}%</div>
+                <small class="text-muted text-uppercase fw-bold" style="font-size: 0.65rem;">Avg Match</small>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            {% for app in data.apps %}
+            <div class="col-lg-6">
+                <div class="applicant-card h-100 p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="fw-bold mb-0">
+                                {{ app.user.username }}
+                                {% if forloop.first %}
+                                    <i class="fas fa-crown text-warning ms-1" title="Top Candidate"></i>
+                                {% endif %}
+                            </h5>
+                            <small class="text-muted">Applied {{ app.applied_at|timesince }} ago</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="h5 fw-bold {% if app.match_percentage >= 70 %}text-success{% else %}text-warning{% endif %} mb-0">
+                                {{ app.match_percentage|floatformat:0 }}%
+                            </div>
+                            <small class="text-muted fw-bold small">MATCH</small>
+                        </div>
+                    </div>
+
+                    <div class="progress mb-4" style="height: 6px; background-color: #f1f5f9;">
+                        <div class="progress-bar {% if app.match_percentage >= 70 %}bg-success{% elif app.match_percentage >= 40 %}bg-warning{% else %}bg-danger{% endif %}" 
+                             role="progressbar" style="width: {{ app.match_percentage }}%"></div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <small class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.65rem;">Interview Readiness</small>
+                            <span class="badge bg-info-subtle text-info border border-info-subtle px-3 py-2 rounded-pill">
+                                <i class="fas fa-comments me-1"></i>{{ app.interview_score|floatformat:0 }}%
+                            </span>
+                        </div>
+                        <div class="col-6 text-end">
+                            <small class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.65rem;">Status</small>
+                            <span class="badge rounded-pill px-3 py-2 
+                                {% if app.status == 'Shortlisted' %}bg-success{% elif app.status == 'Rejected' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                {{ app.status }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <small class="text-muted d-block text-uppercase fw-bold mb-2" style="font-size: 0.65rem;">Skill Gap Analysis</small>
+                        <div class="d-flex flex-wrap gap-1">
+                            <span class="skill-tag skill-matched"><i class="fas fa-check me-1"></i>Matched Skills</span>
+                            <span class="skill-tag skill-missing"><i class="fas fa-times me-1"></i>Missing Gaps</span>
+                        </div>
+                    </div>
+
+                    <hr class="my-4 opacity-50">
+
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'update_status' app.id 'Shortlisted' %}" class="btn btn-success btn-action flex-grow-1">
+                            <i class="fas fa-user-check me-2"></i>Shortlist
+                        </a>
+                        <a href="{% url 'update_status' app.id 'Rejected' %}" class="btn btn-outline-danger btn-action flex-grow-1">
+                            <i class="fas fa-user-times me-2"></i>Reject
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
+
+
+
+

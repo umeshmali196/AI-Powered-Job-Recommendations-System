@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <span class="badge text-bg-primary mb-3">AI Interview Room</span>
+                    <h1 class="h3 mb-2">{{ application.job.title }}</h1>
+                    <p class="text-muted mb-4">{{ application.job.company }} · {{ application.full_name }}</p>
+
+                    <div class="ratio ratio-4x3 rounded-4 overflow-hidden bg-dark mb-3">
+                        <video id="cameraPreview" autoplay muted playsinline class="w-100 h-100 object-fit-cover"></video>
+                    </div>
+
+                    <div id="cameraStatus" class="alert alert-warning small mb-3">
+                        Camera verification pending. Please allow camera access and keep your face visible.
+                    </div>
+                    <div id="speechStatus" class="alert alert-light small mb-0">
+                        Speech helper ready. Use the microphone buttons to dictate answers if your browser supports it.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4 p-lg-5">
+                    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+                        <div>
+                            <h2 class="h3 mb-2">Dynamic interview questions</h2>
+                            <p class="text-muted mb-0">Questions are generated from your resume skills and the target role. Each candidate gets a different mix.</p>
+                        </div>
+                        <span class="badge text-bg-light border">{{ application.generated_questions|length }} questions</span>
+                    </div>
+
+                    <div class="rounded-4 bg-light p-3 mb-4">
+                        <div class="fw-semibold mb-1">Anti-cheating checks</div>
+                        <div class="text-muted small">Keep your camera on, stay visible on screen, and answer in your own words. If your browser supports the Face Detection API, a visibility check will run locally in the page.</div>
+                    </div>
+
+                    <form method="post" class="row g-4">
+                        {% csrf_token %}
+                        {% for question in application.generated_questions %}
+                            <div class="col-12">
+                                <div class="rounded-4 border p-4">
+                                    <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                                        <div>
+                                            <div class="small text-uppercase text-muted fw-semibold mb-1">Question {{ forloop.counter }}</div>
+                                            <h3 class="h5 mb-0">{{ question.question }}</h3>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary start-dictation" data-target="answer_{{ question.id }}">🎤 Dictate</button>
+                                    </div>
+                                    <textarea
+                                        id="answer_{{ question.id }}"
+                                        name="answer_{{ question.id }}"
+                                        rows="5"
+                                        class="form-control"
+                                        placeholder="Write your answer here..."
+                                        required>{% for answer in application.submitted_answers %}{% if answer.question == question.question %}{{ answer.answer }}{% endif %}{% endfor %}</textarea>
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                        <div class="col-12 d-flex flex-wrap gap-3">
+                            <button type="submit" class="btn btn-primary btn-lg">Submit Interview</button>
+                            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-lg">Back to Dashboard</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const cameraPreview = document.getElementById("cameraPreview");
+const cameraStatus = document.getElementById("cameraStatus");
+const speechStatus = document.getElementById("speechStatus");
+
+async function startCamera() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        if (cameraStatus) {
+            cameraStatus.className = "alert alert-danger small mb-3";
+            cameraStatus.textContent = "Camera access is not available in this browser.";
+        }
+        return;
+    }
+
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        if (cameraPreview) {
+            cameraPreview.srcObject = stream;
+        }
+        if (cameraStatus) {
+            cameraStatus.className = "alert alert-success small mb-3";
+            cameraStatus.textContent = "Camera and microphone connected. Stay visible during the interview.";
+        }
+
+        if ("FaceDetector" in window) {
+            const detector = new FaceDetector();
+            const checkFace = async () => {
+                if (!cameraPreview || cameraPreview.readyState < 2) {
+                    window.setTimeout(checkFace, 3000);
+                    return;
+                }
+                try {
+                    const faces = await detector.detect(cameraPreview);
+                    if (cameraStatus) {
+                        if (faces.length > 0) {
+                            cameraStatus.className = "alert alert-success small mb-3";
+                            cameraStatus.textContent = "Face detected. You are ready to continue.";
+                        } else {
+                            cameraStatus.className = "alert alert-warning small mb-3";
+                            cameraStatus.textContent = "Face not detected. Please stay in the camera frame.";
+                        }
+                    }
+                } catch (error) {
+                    // Local face detection is best-effort only.
+                }
+                window.setTimeout(checkFace, 3000);
+            };
+            checkFace();
+        }
+    } catch (error) {
+        if (cameraStatus) {
+            cameraStatus.className = "alert alert-danger small mb-3";
+            cameraStatus.textContent = "Camera access denied. Please allow access to continue the interview properly.";
+        }
+    }
+}
+
+function wireSpeechToText() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const buttons = document.querySelectorAll(".start-dictation");
+
+    if (!SpeechRecognition) {
+        if (speechStatus) {
+            speechStatus.className = "alert alert-warning small mb-0";
+            speechStatus.textContent = "Speech-to-text is not supported in this browser. You can still type your answers.";
+        }
+        buttons.forEach(button => button.disabled = true);
+        return;
+    }
+
+    if (speechStatus) {
+        speechStatus.className = "alert alert-success small mb-0";
+        speechStatus.textContent = "Speech helper is available. Click Dictate to speak an answer.";
+    }
+
+    buttons.forEach(button => {
+        button.addEventListener("click", () => {
+            const target = document.getElementById(button.dataset.target);
+            if (!target) {
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = "en-IN";
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            recognition.onresult = event => {
+                const transcript = event.results[0][0].transcript;
+                target.value = target.value ? `${target.value} ${transcript}` : transcript;
+            };
+
+            recognition.start();
+        });
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    startCamera();
+    wireSpeechToText();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,660 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .category-page-shell {
+        display: flex;
+        flex-direction: column;
+        gap: 1.75rem;
+    }
+
+    .category-hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: 30px;
+        padding: clamp(1.5rem, 4vw, 2.8rem);
+        background:
+            radial-gradient(circle at top right, rgba(14, 165, 233, 0.18), transparent 28%),
+            linear-gradient(140deg, #0f172a 0%, #1e3a8a 48%, #0891b2 100%);
+        color: #ffffff;
+        box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+    }
+
+    .category-hero::after {
+        content: "";
+        position: absolute;
+        right: -40px;
+        bottom: -60px;
+        width: 200px;
+        height: 200px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .hero-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.55rem 0.95rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        font-size: 0.9rem;
+        font-weight: 700;
+    }
+
+    .hero-heading {
+        margin: 1rem 0 0.85rem;
+        font-size: clamp(2rem, 5vw, 3.25rem);
+        line-height: 1.1;
+        font-weight: 800;
+    }
+
+    .hero-subtitle {
+        margin: 0;
+        max-width: 62ch;
+        color: rgba(255, 255, 255, 0.86);
+        font-size: 1.02rem;
+        line-height: 1.75;
+    }
+
+    .hero-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+        margin-top: 1.8rem;
+    }
+
+    .hero-metric {
+        padding: 1rem 1.1rem;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(8px);
+    }
+
+    .hero-metric strong {
+        display: block;
+        font-size: 1.4rem;
+        line-height: 1;
+        margin-bottom: 0.35rem;
+    }
+
+    .hero-metric span {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.92rem;
+    }
+
+    .filters-card {
+        border: 0;
+        border-radius: 26px;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+        overflow: hidden;
+    }
+
+    .filters-card-body {
+        padding: 1.35rem;
+    }
+
+    .filters-title {
+        margin: 0 0 0.35rem;
+        color: #0f172a;
+        font-size: 1.2rem;
+        font-weight: 800;
+    }
+
+    .filters-copy {
+        margin: 0 0 1rem;
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+
+    .form-control,
+    .form-select {
+        min-height: 52px;
+        border-radius: 16px;
+        border-color: #dbeafe;
+        box-shadow: none;
+    }
+
+    .filter-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .results-summary {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .results-summary-title {
+        margin: 0;
+        color: #0f172a;
+        font-size: 1.15rem;
+        font-weight: 800;
+    }
+
+    .results-summary-copy {
+        color: #64748b;
+        margin: 0.35rem 0 0;
+    }
+
+    .filter-chip-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+    }
+
+    .filter-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.5rem 0.8rem;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 0.88rem;
+        font-weight: 700;
+    }
+
+    .job-card {
+        position: relative;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid #dbeafe;
+        border-radius: 24px;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+        box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+    .job-card:hover {
+        transform: translateY(-8px);
+        border-color: #60a5fa;
+        box-shadow: 0 24px 48px rgba(37, 99, 235, 0.14);
+    }
+
+    .job-card::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 5px;
+        background: linear-gradient(180deg, #2563eb, #06b6d4);
+    }
+
+    .job-card-topbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.85rem;
+        margin-bottom: 1.15rem;
+    }
+
+    .job-card-header,
+    .job-card-body,
+    .job-card-footer {
+        position: relative;
+        z-index: 1;
+    }
+
+    .job-card-header {
+        padding: 1.5rem 1.5rem 1rem;
+    }
+
+    .job-card-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+    }
+
+    .job-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.42rem 0.72rem;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 0.8rem;
+        font-weight: 700;
+    }
+
+    .job-pill-soft {
+        background: #ecfeff;
+        color: #0f766e;
+    }
+
+    .job-pill-muted {
+        background: #f8fafc;
+        color: #64748b;
+    }
+
+    .job-badge-recommended {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.45rem 0.8rem;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #dbeafe, #ecfeff);
+        color: #1d4ed8;
+        font-size: 0.82rem;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .company-strip {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .company-avatar {
+        width: 56px;
+        height: 56px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #2563eb, #0ea5e9);
+        color: #ffffff;
+        font-size: 1.35rem;
+        font-weight: 800;
+        flex-shrink: 0;
+        box-shadow: 0 16px 28px rgba(37, 99, 235, 0.2);
+    }
+
+    .company-block {
+        min-width: 0;
+    }
+
+    .job-title {
+        color: #0f172a;
+        font-size: 1.35rem;
+        font-weight: 800;
+        margin: 0 0 0.6rem;
+        line-height: 1.35;
+    }
+
+    .company-name {
+        margin: 0;
+        color: #475569;
+        font-weight: 600;
+    }
+
+    .match-panel {
+        margin-top: 1rem;
+        padding: 0.95rem 1rem;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #eff6ff, #f8fafc);
+        border: 1px solid #dbeafe;
+    }
+
+    .match-score {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 0.65rem;
+    }
+
+    .match-label {
+        display: block;
+        color: #64748b;
+        font-size: 0.82rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.25rem;
+    }
+
+    .match-score strong {
+        color: #0f172a;
+        font-size: 1.1rem;
+    }
+
+    .match-caption {
+        color: #2563eb;
+        font-size: 0.84rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .job-card-body {
+        padding: 0 1.5rem 1.2rem;
+        flex: 1;
+    }
+
+    .job-summary {
+        color: #64748b;
+        font-size: 0.96rem;
+        line-height: 1.7;
+        margin-bottom: 1rem;
+    }
+
+    .job-insight-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.85rem;
+        margin-bottom: 1rem;
+    }
+
+    .job-insight {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.8rem;
+        padding: 0.9rem;
+        border-radius: 18px;
+        background: #f8fbff;
+        border: 1px solid #e0ecff;
+    }
+
+    .job-detail {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.85rem;
+        padding: 0.9rem 0;
+        border-top: 1px solid #eef2ff;
+    }
+
+    .job-detail:first-child {
+        border-top: 0;
+        padding-top: 0;
+    }
+
+    .detail-icon {
+        width: 38px;
+        height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: #eff6ff;
+        color: #2563eb;
+        flex-shrink: 0;
+    }
+
+    .detail-content {
+        flex: 1;
+    }
+
+    .detail-label {
+        color: #94a3b8;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.25rem;
+    }
+
+    .detail-value {
+        color: #334155;
+        font-weight: 600;
+    }
+
+    .job-location-link {
+        color: #334155;
+        text-decoration: none;
+    }
+
+    .job-location-link:hover {
+        color: #2563eb;
+    }
+
+    .skills-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .skill-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.42rem 0.78rem;
+        border-radius: 999px;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        color: #1d4ed8;
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+
+    .salary-section {
+        margin-top: 0.35rem;
+        padding: 1rem;
+        border-radius: 20px;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(34, 197, 94, 0.08));
+        border: 1px solid rgba(16, 185, 129, 0.18);
+    }
+
+    .salary-label {
+        color: #64748b;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.35rem;
+    }
+
+    .salary-value {
+        color: #059669;
+        font-size: 1.25rem;
+        font-weight: 800;
+    }
+
+    .job-card-footer {
+        padding: 0 1.5rem 1.5rem;
+    }
+
+    .job-card-actions {
+        display: flex;
+        gap: 0.85rem;
+        margin-top: 1rem;
+    }
+
+    .save-job-form {
+        flex: 1;
+    }
+
+    .save-job-btn {
+        width: 100%;
+        min-height: 54px;
+        border-radius: 16px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .save-job-btn.saved {
+        background: #eff6ff;
+        border-color: #bfdbfe;
+        color: #1d4ed8;
+    }
+
+    .quick-action-btn {
+        min-width: 112px;
+        border-radius: 16px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .view-details-btn {
+        flex: 1;
+        padding: 0.92rem 1.2rem;
+        border: 0;
+        border-radius: 16px;
+        background: linear-gradient(90deg, #2563eb, #0891b2);
+        color: #ffffff;
+        font-size: 0.98rem;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.55rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .view-details-btn:hover {
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 16px 28px rgba(37, 99, 235, 0.25);
+    }
+
+    .no-jobs {
+        text-align: center;
+        padding: 3rem 1.5rem;
+        color: #64748b;
+        border: 1px dashed #cbd5e1;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.85);
+    }
+
+    @media (max-width: 991px) {
+        .hero-metrics {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .category-hero {
+            border-radius: 24px;
+        }
+
+        .hero-metrics {
+            grid-template-columns: 1fr;
+        }
+
+        .job-insight-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .job-card-actions {
+            flex-direction: column;
+        }
+
+        .save-job-form,
+        .quick-action-btn,
+        .view-details-btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="category-page-shell">
+    <section class="category-hero">
+        <span class="hero-pill">
+            <i class="{{ selected_category.icon }}"></i>
+            {{ selected_category.name }}
+        </span>
+        <h1 class="hero-heading">Professional opportunities in {{ selected_category.name }}</h1>
+        <p class="hero-subtitle">
+            Search and refine jobs by role, company, skills, location, and job type while keeping the same familiar job card flow.
+        </p>
+
+        <div class="hero-metrics">
+            <div class="hero-metric">
+                <strong>{{ results_count }}</strong>
+                <span>matching jobs</span>
+            </div>
+            <div class="hero-metric">
+                <strong>{{ selected_category.name }}</strong>
+                <span>active category</span>
+            </div>
+            <div class="hero-metric">
+                <strong>AI Match</strong>
+                <span>personalized ranking remains active</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="card filters-card">
+        <div class="filters-card-body">
+            <div class="row g-4 align-items-end">
+                <div class="col-12 col-lg-4">
+                    <h2 class="filters-title">Search and filter jobs</h2>
+                    <p class="filters-copy">Use smart filters to narrow the job list without losing the existing card experience.</p>
+                </div>
+
+                <div class="col-12 col-lg-8">
+                    <form method="GET" class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <input
+                                type="text"
+                                name="q"
+                                class="form-control"
+                                placeholder="Search title, company, skills..."
+                                value="{{ search_query }}">
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <input
+                                type="text"
+                                name="location"
+                                class="form-control"
+                                placeholder="Location"
+                                value="{{ location_query }}">
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <select name="job_type" class="form-select">
+                                <option value="">All job types</option>
+                                {% for value, label in job_type_choices %}
+                                    <option value="{{ value }}" {% if job_type_query == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <div class="filter-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-magnifying-glass me-2"></i>
+                                    Apply Filters
+                                </button>
+                                <a href="{% url 'category_jobs' selected_category.slug %}" class="btn btn-outline-secondary">
+                                    Reset
+                                </a>
+                                <a href="{% url 'job_list' %}" class="btn btn-outline-primary">
+                                    Back to Categories
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="results-summary">
+        <div>
+            <h3 class="results-summary-title">{{ results_count }} jobs found</h3>
+            <p class="results-summary-copy">Showing jobs for {{ selected_category.name }}{% if search_query or location_query or job_type_query %} with your active filters{% endif %}.</p>
+        </div>
+
+        <div class="filter-chip-wrap">
+            {% if search_query %}
+                <span class="filter-chip"><i class="fas fa-search"></i> {{ search_query }}</span>
+            {% endif %}
+            {% if location_query %}
+                <span class="filter-chip"><i class="fas fa-location-dot"></i> {{ location_query }}</span>
+            {% endif %}
+            {% if job_type_query %}
+                <span class="filter-chip"><i class="fas fa-briefcase"></i> {{ job_type_query }}</span>
+            {% endif %}
+        </div>
+    </section>
+
+    {% include "jobs/_job_cards.html" %}
+</div>
+
+{% endblock %}

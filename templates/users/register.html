@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="auth-shell">
+    <div class="auth-card-pro register-card-pro">
+        <div class="auth-header">
+            <span class="auth-kicker register-kicker">New account</span>
+            <h2>Create your account</h2>
+            <p>Register to start applying and tracking jobs.</p>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="auth-alert" role="alert">
+                    {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="register-grid">
+                <div class="form-field-group">
+                    <label for="{{ form.username.id_for_label }}">Username</label>
+                    {{ form.username }}
+                    {% if form.username.help_text %}
+                        <div class="field-help">{{ form.username.help_text|safe }}</div>
+                    {% endif %}
+                    {% if form.username.errors %}
+                        <div class="field-error">{{ form.username.errors|join:', ' }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-field-group">
+                    <label for="{{ form.email.id_for_label }}">Email</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <div class="field-error">{{ form.email.errors|join:', ' }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-field-group">
+                    <label for="{{ form.password1.id_for_label }}">Password</label>
+                    {{ form.password1 }}
+                    {% if form.password1.help_text %}
+                        <div class="field-help">{{ form.password1.help_text|safe }}</div>
+                    {% endif %}
+                    {% if form.password1.errors %}
+                        <div class="field-error">{{ form.password1.errors|join:', ' }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-field-group">
+                    <label for="{{ form.password2.id_for_label }}">Confirm password</label>
+                    {{ form.password2 }}
+                    {% if form.password2.help_text %}
+                        <div class="field-help">{{ form.password2.help_text|safe }}</div>
+                    {% endif %}
+                    {% if form.password2.errors %}
+                        <div class="field-error">{{ form.password2.errors|join:', ' }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="d-grid auth-submit-wrap">
+                <button type="submit" class="btn-custom register-submit-btn">Create Account</button>
+            </div>
+        </form>
+
+        <div class="auth-footer-note">
+            <span>Already registered?</span>
+            <a href="{% url 'login' %}">Log in</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .auth-shell {
+        min-height: calc(100vh - 150px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem 0 3rem;
+    }
+
+    .auth-card-pro {
+        width: 100%;
+        max-width: 560px;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        border: 1px solid #dbe4ee;
+        border-radius: 20px;
+        box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+        padding: 1.5rem;
+    }
+
+    .register-card-pro {
+        max-width: 560px;
+    }
+
+    .auth-header {
+        margin-bottom: 1rem;
+    }
+
+    .auth-kicker {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 0.85rem;
+    }
+
+    .register-kicker {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .auth-header h2 {
+        margin: 0;
+        color: #0f172a;
+        font-size: 1.55rem;
+        font-weight: 700;
+    }
+
+    .auth-header p {
+        margin: 0.5rem 0 0;
+        color: #64748b;
+    }
+
+    .auth-alert {
+        margin: 0 0 1rem;
+        padding: 0.95rem 1rem;
+        border-radius: 12px;
+        border: 1px solid #fecaca;
+        background: #fff1f2;
+        color: #b91c1c;
+        font-size: 0.92rem;
+    }
+
+    .register-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.85rem;
+        margin-top: 0.4rem;
+    }
+
+    .form-field-group label {
+        display: block;
+        margin-bottom: 0.45rem;
+        color: #334155;
+        font-size: 0.86rem;
+        font-weight: 700;
+    }
+
+    .form-field-group input,
+    .form-field-group select,
+    .form-field-group textarea {
+        width: 100%;
+        padding: 0.75rem 0.9rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 12px;
+        background: #ffffff;
+        color: #0f172a;
+    }
+
+    .form-field-group input:focus,
+    .form-field-group select:focus,
+    .form-field-group textarea:focus {
+        border-color: #16a34a;
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.12);
+    }
+
+    .field-help {
+        margin-top: 0.45rem;
+        color: #64748b;
+        font-size: 0.8rem;
+        line-height: 1.55;
+    }
+
+    .field-help ul {
+        margin: 0.35rem 0 0;
+        padding-left: 1rem;
+    }
+
+    .field-error {
+        margin-top: 0.45rem;
+        color: #dc2626;
+        font-size: 0.83rem;
+    }
+
+    .auth-submit-wrap {
+        margin-top: 1.3rem;
+    }
+
+    .register-submit-btn {
+        min-height: 50px;
+        border-radius: 12px;
+        background: linear-gradient(90deg, #166534 0%, #1d4ed8 100%);
+        box-shadow: 0 14px 24px rgba(22, 163, 74, 0.18);
+    }
+
+    .register-submit-btn:hover {
+        background: linear-gradient(90deg, #14532d 0%, #1e40af 100%);
+    }
+
+    .auth-footer-note {
+        margin-top: 1.3rem;
+        display: flex;
+        justify-content: center;
+        gap: 0.3rem;
+        color: #64748b;
+    }
+
+    .auth-footer-note a {
+        color: #166534;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    @media (max-width: 575.98px) {
+        .auth-card-pro {
+            border-radius: 16px;
+            padding: 1.25rem;
+        }
+    }
+</style>
+{% endblock %}

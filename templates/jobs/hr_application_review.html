@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <a href="{% url 'hr_dashboard' %}" class="small fw-semibold text-decoration-none">← Back to HR Dashboard</a>
+            <h1 class="h2 mt-2 mb-1">Candidate Review</h1>
+            <p class="text-muted mb-0">{{ application.full_name }} · {{ application.job.title }} · {{ application.job.company }}</p>
+        </div>
+        <span class="badge text-bg-light border fs-6">{{ application.status }}</span>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h2 class="h4 mb-3">Candidate Snapshot</h2>
+                    <div class="row g-3">
+                        <div class="col-md-6"><div class="rounded-4 bg-light p-3 h-100"><div class="small text-muted text-uppercase fw-semibold mb-1">Phone</div><div class="fw-semibold">{{ application.phone_number }}</div></div></div>
+                        <div class="col-md-6"><div class="rounded-4 bg-light p-3 h-100"><div class="small text-muted text-uppercase fw-semibold mb-1">Email</div><div class="fw-semibold">{{ application.email }}</div></div></div>
+                        <div class="col-md-4"><div class="rounded-4 bg-light p-3 h-100"><div class="small text-muted text-uppercase fw-semibold mb-1">Match</div><div class="h4 mb-0">{{ application.match_percentage|floatformat:0 }}%</div></div></div>
+                        <div class="col-md-4"><div class="rounded-4 bg-light p-3 h-100"><div class="small text-muted text-uppercase fw-semibold mb-1">Resume</div><div class="h4 mb-0">{{ application.resume_score|floatformat:0 }}%</div></div></div>
+                        <div class="col-md-4"><div class="rounded-4 bg-light p-3 h-100"><div class="small text-muted text-uppercase fw-semibold mb-1">Interview</div><div class="h4 mb-0">{{ application.interview_score|floatformat:0 }}%</div></div></div>
+                    </div>
+
+                    <div class="mt-4">
+                        <h3 class="h5 mb-2">Skills</h3>
+                        <div class="rounded-4 border p-3 text-muted mb-3">{{ application.skills|default:"Candidate skills were not added separately." }}</div>
+                        <div class="text-muted small mb-2"><strong>Matched skills:</strong> {{ application.matched_skills|default:"Not available yet" }}</div>
+                        <div class="text-muted small"><strong>Missing skills:</strong> {{ application.missing_skills|default:"No major skill gaps detected" }}</div>
+                    </div>
+
+                    {% if application.cover_letter %}
+                        <div class="mt-4">
+                            <h3 class="h5 mb-2">Cover Letter</h3>
+                            <div class="rounded-4 border p-3 text-muted">{{ application.cover_letter|linebreaksbr }}</div>
+                        </div>
+                    {% endif %}
+
+                    {% if application.resume %}
+                        <div class="mt-4">
+                            <a href="{{ application.resume.url }}" target="_blank" class="btn btn-outline-primary">View Resume</a>
+                            {% if application.status == "Interview Scheduled" or application.status == "Interview Completed" %}
+                                <a href="{% url 'interview' application.id %}" class="btn btn-outline-secondary">Open Interview Room</a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 mb-3">Application Timeline</h2>
+                    {% for event in timeline %}
+                        <div class="rounded-4 border p-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-start gap-3">
+                                <div>
+                                    <div class="fw-semibold">{{ event.status }}</div>
+                                    <div class="text-muted small">{{ event.note|default:"No note added." }}</div>
+                                </div>
+                                <div class="text-muted small text-nowrap">{{ event.created_at|date:"M d, Y H:i" }}</div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="rounded-4 bg-light p-4 text-center text-muted">Timeline updates will appear here.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h2 class="h4 mb-3">HR Actions</h2>
+                    <form method="post" class="row g-3">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div class="col-12">
+                                <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field }}
+                                {% for error in field.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                        <div class="col-12 d-grid">
+                            <button type="submit" class="btn btn-primary">Save Review</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h4 mb-3">AI Summary</h2>
+                    <p class="text-muted mb-3">{{ application.ai_summary|default:"AI summary will update after screening and interview evaluation." }}</p>
+                    <div class="rounded-4 bg-light p-3 mb-3">
+                        <div class="small text-muted text-uppercase fw-semibold mb-1">Suggested Salary</div>
+                        <div class="fw-semibold">{{ application.salary_suggestion|default:"Will be calculated after evaluation" }}</div>
+                    </div>
+                    {% if application.offer_letter %}
+                        <div class="rounded-4 border p-3">
+                            <div class="small text-muted text-uppercase fw-semibold mb-1">Offer Letter</div>
+                            <pre class="mb-0 small" style="white-space: pre-wrap;">{{ application.offer_letter }}</pre>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

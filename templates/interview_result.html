@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5 text-center">
+
+<h2>Interview Result</h2>
+
+<p><strong>Candidate:</strong> {{ candidate }}</p>
+<p><strong>Job:</strong> {{ job }}</p>
+
+<hr>
+
+<h4>Technical Score: {{ technical_score }}%</h4>
+<h4>Communication Score: {{ communication_score }}%</h4>
+
+<h3 class="mt-3 text-success">
+Overall Score: {{ overall_score }}%
+</h3>
+
+<a href="/jobs/hr-dashboard/" class="btn btn-primary mt-4">
+Go to HR Dashboard
+</a>
+
+</div>
+
+{% endblock %}

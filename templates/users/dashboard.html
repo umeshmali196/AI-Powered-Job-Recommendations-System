@@ -1,0 +1,529 @@
+{% extends "base.html" %}
+
+{% block body_class %}dashboard-page{% endblock %}
+{% block page_container_class %}container py-4{% endblock %}
+
+{% block extra_head %}
+<style>
+    .dashboard-page { background: linear-gradient(180deg, #f6f9ff 0%, #eef4fb 55%, #f8fafc 100%); }
+    .dashboard-wrap { max-width: 1380px; margin: 0 auto; }
+    .n-card { background: rgba(255,255,255,.97); border: 1px solid rgba(148,163,184,.16); border-radius: 28px; box-shadow: 0 18px 40px rgba(15,23,42,.08); }
+    .hero { padding: 2rem; }
+    .hero-grid { display: grid; grid-template-columns: 220px minmax(0,1fr) 340px; gap: 1.5rem; align-items: center; }
+    .ring { --angle: 180deg; width: 180px; height: 180px; margin: 0 auto; border-radius: 50%; background: conic-gradient(#ff5a43 0deg, #ff5a43 var(--angle), #e8edf7 var(--angle), #e8edf7 360deg); padding: 10px; position: relative; }
+    .ring::after { content: ""; position: absolute; inset: 18px; border-radius: 50%; background: #fff; }
+    .avatar { position: relative; z-index: 1; width: 128px; height: 128px; border-radius: 50%; margin: 16px auto 0; background: linear-gradient(135deg, #7a7f89, #5c6270); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 700; text-align: center; overflow: hidden; }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .plus { position: absolute; inset: 50% auto auto 50%; transform: translate(-50%, -50%); width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,.92); color: #64748b; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 8px 22px rgba(15,23,42,.16); }
+    .pill-progress { position: absolute; left: 50%; bottom: -10px; transform: translateX(-50%); z-index: 1; background: #fff; color: #ff5a43; font-weight: 800; border-radius: 999px; padding: .45rem .95rem; box-shadow: 0 8px 20px rgba(15,23,42,.14); }
+    .photo-form { margin-top: 1.6rem; display: grid; gap: .7rem; }
+    .photo-form .form-control { max-width: 220px; margin: 0 auto; }
+    .hero h1 { font-size: clamp(2rem, 3vw, 2.7rem); font-weight: 800; color: #162554; margin-bottom: .35rem; }
+    .hero .sub { font-size: 1.35rem; font-weight: 700; color: #465077; margin-bottom: .35rem; }
+    .meta-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: .8rem 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(148,163,184,.2); }
+    .meta-item { display: flex; gap: .65rem; align-items: center; color: #334155; min-width: 0; }
+    .meta-item i { width: 18px; color: #64748b; }
+    .meta-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .growth { background: linear-gradient(180deg, #fff2e5, #fff9f1); border-radius: 24px; border: 1px solid rgba(251,146,60,.18); padding: 1.5rem; }
+    .growth h3 { font-size: 1.35rem; font-weight: 800; color: #24325b; margin-bottom: .35rem; }
+    .growth-item { display: grid; grid-template-columns: 44px minmax(0,1fr) auto; gap: .8rem; align-items: center; margin-top: .95rem; }
+    .growth-item i:first-child, .q-icon { width: 44px; height: 44px; border-radius: 50%; background: #fff; color: #465077; display: inline-flex; align-items: center; justify-content: center; }
+    .boost { background: #fff; color: #22c55e; font-weight: 800; border-radius: 999px; padding: .3rem .75rem; white-space: nowrap; }
+    .dashboard-tabs { border-bottom: 1px solid rgba(148,163,184,.18); margin-top: 1.75rem; }
+    .dashboard-tabs .nav-link { border: 0; border-radius: 0; padding: .25rem 0 .9rem; margin-right: 1.4rem; background: transparent; color: #64748b; font-weight: 700; font-size: 1.1rem; }
+    .dashboard-tabs .nav-link.active { color: #111827; border-bottom: 4px solid #111827; }
+    .main-grid { display: grid; grid-template-columns: 280px minmax(0,1fr); gap: 1.25rem; margin-top: 1.5rem; align-items: start; }
+    .quick { position: sticky; top: 2rem; padding: 1.5rem; }
+    .quick a { display: flex; justify-content: space-between; align-items: center; gap: .75rem; padding: .85rem 0; border-bottom: 1px solid rgba(226,232,240,.9); text-decoration: none; }
+    .quick a:last-child { border-bottom: 0; padding-bottom: 0; }
+    .quick strong { color: #1f2a4f; display: block; }
+    .quick small { color: #64748b; }
+    .quick span:last-child { color: #2563eb; font-weight: 800; white-space: nowrap; }
+    .stack { display: grid; gap: 1.25rem; }
+    .section-card { padding: 1.5rem; }
+    .section-head { display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start; margin-bottom: 1.1rem; }
+    .section-title { font-size: 1.15rem; font-weight: 800; color: #1f2a4f; margin-bottom: .2rem; }
+    .section-copy, .muted { color: #64748b; }
+    .chip { border-radius: 999px; background: #eff6ff; color: #1d4ed8; font-weight: 700; padding: .45rem .85rem; white-space: nowrap; }
+    .pref-grid, .stats-grid, .cards-2, .editor-grid { display: grid; gap: 1rem; }
+    .pref-grid, .cards-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .stats-grid { grid-template-columns: repeat(4, minmax(0,1fr)); }
+    .editor-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .editor-full { grid-column: 1 / -1; }
+    .section-action-row { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1rem; }
+    .form-hint { color: #64748b; font-size: .92rem; margin-top: .35rem; }
+    .box { border: 1px solid rgba(148,163,184,.16); border-radius: 22px; background: #fff; padding: 1.15rem; }
+    .label { font-size: .84rem; text-transform: uppercase; letter-spacing: .04em; color: #94a3b8; font-weight: 700; margin-bottom: .35rem; }
+    .value { color: #334155; margin: 0; }
+    .skill-list, .job-skills { display: flex; flex-wrap: wrap; gap: .55rem; }
+    .skill-list span, .job-skills span { border-radius: 999px; border: 1px solid rgba(148,163,184,.16); background: #f8fafc; color: #475569; padding: .45rem .8rem; font-weight: 600; }
+    .mini { display: flex; gap: .9rem; align-items: center; }
+    .mini .q-icon { border-radius: 16px; background: #eff6ff; color: #2563eb; }
+    .mini strong { display: block; font-size: 1.4rem; color: #1f2a4f; line-height: 1; }
+    .score { background: linear-gradient(180deg, #fff, #f8fbff); }
+    .score strong { font-size: 1.9rem; color: #1f2a4f; line-height: 1; display: block; margin-bottom: .3rem; }
+    .status-pill { display: inline-flex; padding: .4rem .8rem; border-radius: 999px; font-size: .85rem; font-weight: 700; border: 1px solid transparent; }
+    .s-applied { background: #eff6ff; color: #1d4ed8; border-color: rgba(59,130,246,.15); }
+    .s-review { background: #fff7ed; color: #b45309; border-color: rgba(251,146,60,.15); }
+    .s-interview { background: #f5f3ff; color: #7c3aed; border-color: rgba(139,92,246,.15); }
+    .s-selected { background: #f0fdf4; color: #15803d; border-color: rgba(34,197,94,.15); }
+    .s-rejected { background: #fef2f2; color: #b91c1c; border-color: rgba(239,68,68,.15); }
+    .table thead th { font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; color: #94a3b8; white-space: nowrap; }
+    .chart-box canvas { width: 100% !important; height: 320px !important; }
+    .interview-box { background: linear-gradient(135deg, #172554, #1d4ed8); color: #fff; }
+    .interview-box .section-title, .interview-box .section-copy, .interview-box .muted { color: #fff; }
+    .timeline { display: grid; gap: .9rem; }
+    .timeline .box { display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start; }
+    .empty { border: 1px dashed rgba(148,163,184,.28); border-radius: 22px; background: #f8fafc; color: #64748b; padding: 1.4rem; text-align: center; }
+    @media (max-width: 1199.98px) { .hero-grid, .main-grid, .pref-grid, .cards-2, .stats-grid, .editor-grid { grid-template-columns: 1fr; } .quick { position: static; } }
+    @media (max-width: 767.98px) { .hero, .quick, .section-card { padding: 1.1rem; } .meta-grid { grid-template-columns: 1fr; } .dashboard-tabs .nav-link { margin-right: 1rem; font-size: 1rem; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrap">
+    {% if messages %}
+        <div class="mb-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }} n-card">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <section class="n-card hero">
+        <div class="hero-grid">
+            <div class="text-center">
+                <div class="ring" style="--angle: calc({{ profile_completion|floatformat:0 }} * 3.6deg);">
+                    <div class="avatar">
+                        {% if profile.profile_photo %}
+                            <img src="{{ profile.profile_photo.url }}" alt="{{ request.user.get_full_name|default:request.user.username }}">
+                        {% elif profile.github_avatar_url %}
+                            <img src="{{ profile.github_avatar_url }}" alt="{{ request.user.get_full_name|default:request.user.username }}">
+                        {% else %}
+                            Add photo
+                            <span class="plus"><i class="fa-solid fa-plus"></i></span>
+                        {% endif %}
+                    </div>
+                    <div class="pill-progress">{{ profile_completion|floatformat:0 }}%</div>
+                </div>
+                <form method="post" enctype="multipart/form-data" class="photo-form">
+                    {% csrf_token %}
+                    {{ photo_form.profile_photo }}
+                    {% for error in photo_form.profile_photo.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                    <button type="submit" name="photo_submit" value="1" class="btn btn-primary btn-sm">Save Photo</button>
+                </form>
+            </div>
+
+            <div>
+                <h1>{{ request.user.get_full_name|default:request.user.username }}</h1>
+                <div class="sub">{{ profile.headline|default:"Build a standout candidate profile" }}</div>
+                <p class="muted mb-0">{% if profile.summary %}{{ profile.summary|truncatewords:22 }}{% else %}Manage applications, recommendations, interview updates, and profile editing from one place.{% endif %}</p>
+                <div class="meta-grid">
+                    <div class="meta-item"><i class="fa-solid fa-location-dot"></i><span>{{ profile.preferred_location|default:"Preferred location not added" }}</span></div>
+                    <div class="meta-item"><i class="fa-solid fa-phone"></i><span>{{ profile.phone_number|default:"Phone number not added" }}</span></div>
+                    <div class="meta-item"><i class="fa-solid fa-envelope"></i><span>{{ request.user.email|default:"Email not added" }}</span></div>
+                    <div class="meta-item"><i class="fa-solid fa-file-lines"></i><span>{% if profile.resume %}{{ profile.resume.name|cut:"resumes/" }}{% else %}Resume not uploaded{% endif %}</span></div>
+                </div>
+            </div>
+
+            <div class="growth">
+                {% if missing_profile_count %}
+                    <h3>Complete your profile</h3>
+                    <p class="muted mb-0">Add {{ missing_profile_count }} missing detail{{ missing_profile_count|pluralize }} to improve visibility and matches.</p>
+                    {% for action in profile_actions %}
+                        <div class="growth-item">
+                            <i class="{{ action.icon }}"></i>
+                            <div><strong>{{ action.title }}</strong><div class="muted">{{ action.description }}</div></div>
+                            <span class="boost">+{{ action.boost }}%</span>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <h3>Profile looks strong</h3>
+                    <p class="muted mb-0">Your main details are already filled. Keep applying and tracking insights.</p>
+                    <div class="growth-item">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <div><strong>Average match</strong><div class="muted">Current recommendation quality.</div></div>
+                        <span class="boost">{{ average_match|floatformat:0 }}%</span>
+                    </div>
+                    <div class="growth-item">
+                        <i class="fa-solid fa-file-circle-check"></i>
+                        <div><strong>Resume score</strong><div class="muted">Resume readiness for AI matching.</div></div>
+                        <span class="boost">{{ resume_score|floatformat:0 }}%</span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <ul class="nav dashboard-tabs" id="dashboardTab" role="tablist">
+        <li class="nav-item" role="presentation"><button class="nav-link active" id="view-tab" data-bs-toggle="tab" data-bs-target="#view-panel" type="button" role="tab">View &amp; Edit</button></li>
+        <li class="nav-item" role="presentation"><button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity-panel" type="button" role="tab">Activity insights</button></li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="view-panel" role="tabpanel">
+            <div class="main-grid">
+                <aside class="n-card quick">
+                    <h3 class="section-title">Quick links</h3>
+                    <a href="#career-fields"><div><strong>Career preferences</strong><small>Headline, location, summary</small></div><span>{% if profile.headline or profile.preferred_location or profile.summary %}Edit{% else %}Add{% endif %}</span></a>
+                    <a href="#skills-fields"><div><strong>Skills &amp; resume</strong><small>Skills, resume, GitHub</small></div><span>{% if profile_skills or profile.resume %}Edit{% else %}Add{% endif %}</span></a>
+                    <a href="#editor-fields"><div><strong>Profile editor</strong><small>Update all details</small></div><span>Edit</span></a>
+                    <a href="#applications"><div><strong>Applications</strong><small>Track every role</small></div><span>{{ total_applications }}</span></a>
+                    <a href="#recommended"><div><strong>Recommended jobs</strong><small>AI ranked roles</small></div><span>{{ recommended_jobs|length }}</span></a>
+                    <a href="#saved"><div><strong>Saved jobs</strong><small>Your shortlist</small></div><span>{{ saved_jobs|length }}</span></a>
+                </aside>
+
+                <div class="stack">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                    <section class="n-card section-card" id="career">
+                        <div class="section-head">
+                            <div><div class="section-title">Your career preferences</div><div class="section-copy">These fields are directly editable now. Add or update them here and save profile changes properly.</div></div>
+                            <span class="chip">Profile {{ profile_completion|floatformat:0 }}%</span>
+                        </div>
+                        <div class="pref-grid" id="career-fields">
+                            <div class="box">
+                                <label class="form-label fw-semibold" for="{{ profile_form.headline.id_for_label }}">Professional headline</label>
+                                {{ profile_form.headline }}
+                            </div>
+                            <div class="box">
+                                <label class="form-label fw-semibold" for="{{ profile_form.preferred_location.id_for_label }}">Preferred location</label>
+                                {{ profile_form.preferred_location }}
+                            </div>
+                            <div class="box">
+                                <div class="label">Availability</div>
+                                <p class="value">{% if upcoming_interview %}Active and interviewing{% else %}Available for opportunities{% endif %}</p>
+                                <div class="form-hint">This is based on your current interview activity.</div>
+                            </div>
+                            <div class="box">
+                                <div class="label">Saved jobs</div>
+                                <p class="value">{{ saved_jobs|length }} shortlisted role{{ saved_jobs|length|pluralize }}</p>
+                                <div class="form-hint">Use saved jobs as your quick shortlist.</div>
+                            </div>
+                            <div class="box editor-full">
+                                <label class="form-label fw-semibold" for="{{ profile_form.summary.id_for_label }}">Profile summary</label>
+                                {{ profile_form.summary }}
+                                <div class="form-hint">Write a short summary describing your background, strengths, and target roles.</div>
+                            </div>
+                        </div>
+                        <div class="section-action-row">
+                            <button type="submit" class="btn btn-primary">Save Career Preferences</button>
+                        </div>
+                    </section>
+
+                    <section class="n-card section-card" id="skills">
+                        <div class="section-head">
+                            <div><div class="section-title">Skills, resume, and portfolio signals</div><div class="section-copy">Add or edit your skills and resume here. The current upload and update functionality stays the same.</div></div>
+                            <span class="chip">Resume {{ resume_score|floatformat:0 }}%</span>
+                        </div>
+                        <div class="cards-2" id="skills-fields">
+                            <div class="box">
+                                <label class="form-label fw-semibold" for="{{ profile_form.skills.id_for_label }}">Key skills</label>
+                                {{ profile_form.skills }}
+                                <div class="form-hint">Add comma-separated skills to improve job matching.</div>
+                            </div>
+                            <div class="box">
+                                <label class="form-label fw-semibold" for="{{ profile_form.resume.id_for_label }}">Resume upload</label>
+                                {{ profile_form.resume }}
+                                <p class="value">{% if profile.resume %}{{ profile.resume.name|cut:"resumes/" }}{% else %}No resume uploaded yet{% endif %}</p>
+                                <p class="muted mt-2 mb-0">{% if profile.resume %}Your resume is ready for AI insights and matching.{% else %}Upload PDF, DOC, or DOCX to unlock stronger recommendations.{% endif %}</p>
+                                {% if profile.resume %}<a href="{{ profile.resume.url }}" target="_blank" class="btn btn-outline-primary btn-sm mt-3">View Resume</a>{% endif %}
+                            </div>
+                            <div class="box">
+                                <div class="label">GitHub profile</div>
+                                <p class="value">{% if profile.github_profile_url %}<a href="{{ profile.github_profile_url }}" target="_blank" rel="noopener noreferrer">{{ profile.github_name|default:profile.github_username }}</a>{% else %}GitHub not linked yet{% endif %}</p>
+                            </div>
+                            <div class="box">
+                                <div class="label">Public repositories</div>
+                                <p class="value">{{ profile.github_public_repos|default:"Not available" }}</p>
+                            </div>
+                        </div>
+                        <div class="section-action-row">
+                            <button type="submit" class="btn btn-primary">Save Skills &amp; Resume</button>
+                        </div>
+                    </section>
+
+                    <section class="n-card section-card" id="editor">
+                        <div class="section-head">
+                            <div><div class="section-title">Update profile details</div><div class="section-copy">Edit personal and contact details here, then save to update the profile properly.</div></div>
+                        </div>
+                        <div class="editor-grid" id="editor-fields">
+                            <div class="box editor-full">
+                                <label class="form-label fw-semibold" for="{{ profile_form.profile_photo.id_for_label }}">Profile photo</label>
+                                {{ profile_form.profile_photo }}
+                                <div class="form-hint">Upload JPG, JPEG, PNG, or WEBP image. Saving this will also increase profile completion.</div>
+                                {% if profile.profile_photo %}
+                                    <div class="mt-3">
+                                        <img src="{{ profile.profile_photo.url }}" alt="{{ request.user.get_full_name|default:request.user.username }}" style="width: 96px; height: 96px; object-fit: cover; border-radius: 20px; border: 1px solid rgba(148,163,184,.16);">
+                                    </div>
+                                {% elif profile.github_avatar_url %}
+                                    <div class="form-hint mt-2">GitHub avatar is currently shown until you upload your own profile photo.</div>
+                                {% endif %}
+                            </div>
+                            <div class="box">
+                                <label class="form-label fw-semibold" for="{{ profile_form.first_name.id_for_label }}">First name</label>
+                                {{ profile_form.first_name }}
+                            </div>
+                            <div class="box">
+                                <label class="form-label fw-semibold" for="{{ profile_form.last_name.id_for_label }}">Last name</label>
+                                {{ profile_form.last_name }}
+                            </div>
+                            <div class="box">
+                                <label class="form-label fw-semibold" for="{{ profile_form.email.id_for_label }}">Email</label>
+                                {{ profile_form.email }}
+                            </div>
+                            <div class="box">
+                                <label class="form-label fw-semibold" for="{{ profile_form.phone_number.id_for_label }}">Phone number</label>
+                                {{ profile_form.phone_number }}
+                            </div>
+                        </div>
+                        <div class="section-action-row">
+                            <button type="submit" class="btn btn-primary">Save Profile</button>
+                            {% if profile.resume %}<a href="{{ profile.resume.url }}" target="_blank" class="btn btn-outline-primary">Open Resume</a>{% endif %}
+                        </div>
+                        {% for field in profile_form %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small mt-2">{{ field.label }}: {{ error }}</div>
+                            {% endfor %}
+                        {% endfor %}
+                    </section>
+                    </form>
+
+                    <section class="n-card section-card" id="applications">
+                        <div class="section-head">
+                            <div><div class="section-title">My applications</div><div class="section-copy">Track every role from applied to final decision. Interview and withdraw actions remain available.</div></div>
+                            <a href="{% url 'job_list' %}" class="btn btn-outline-primary">Browse More Jobs</a>
+                        </div>
+                        <div class="stats-grid mb-4">
+                            <div class="box mini"><span class="q-icon"><i class="fa-solid fa-paper-plane"></i></span><div><strong>{{ applied_count }}</strong><span class="muted">Applied</span></div></div>
+                            <div class="box mini"><span class="q-icon"><i class="fa-solid fa-magnifying-glass"></i></span><div><strong>{{ under_review_count }}</strong><span class="muted">Under Review</span></div></div>
+                            <div class="box mini"><span class="q-icon"><i class="fa-solid fa-calendar-check"></i></span><div><strong>{{ interview_scheduled_count }}</strong><span class="muted">Interview Scheduled</span></div></div>
+                            <div class="box mini"><span class="q-icon"><i class="fa-solid fa-trophy"></i></span><div><strong>{{ selected_count }}</strong><span class="muted">Selected</span></div></div>
+                        </div>
+                        {% if applications %}
+                            <div class="table-responsive">
+                                <table class="table align-middle mb-0">
+                                    <thead><tr><th>Job Title</th><th>Status</th><th>Match</th><th>Resume Score</th><th>Interview</th><th></th></tr></thead>
+                                    <tbody>
+                                        {% for app in applications %}
+                                            <tr>
+                                                <td><div class="fw-semibold">{{ app.job.title }}</div><div class="text-muted small">{{ app.job.company }} - {{ app.job.location }}</div></td>
+                                                <td><span class="status-pill {% if app.status == 'Applied' %}s-applied{% elif app.status == 'Under Review' %}s-review{% elif app.status == 'Interview Scheduled' or app.status == 'Interview Completed' %}s-interview{% elif app.status == 'Selected' %}s-selected{% else %}s-rejected{% endif %}">{{ app.status }}</span></td>
+                                                <td>{{ app.match_percentage|floatformat:0 }}%</td>
+                                                <td>{{ app.resume_score|floatformat:0 }}%</td>
+                                                <td>{% if app.interview_score %}{{ app.interview_score|floatformat:0 }}%{% else %}<span class="text-muted">Pending</span>{% endif %}</td>
+                                                <td class="text-end">
+                                                    <div class="d-flex flex-wrap justify-content-end gap-2">
+                                                        <a href="{% url 'job_detail' app.job.id %}" class="btn btn-sm btn-outline-secondary">View Job</a>
+                                                        {% if app.status == "Interview Scheduled" or app.status == "Interview Completed" %}<a href="{% url 'interview' app.id %}" class="btn btn-sm btn-outline-primary">Interview</a>{% endif %}
+                                                        <a href="{% url 'delete_application' app.id %}" class="btn btn-sm btn-outline-danger">Withdraw</a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="empty">You have not applied to any jobs yet.</div>
+                        {% endif %}
+                    </section>
+
+                    <section class="n-card section-card" id="recommended">
+                        <div class="section-head">
+                            <div><div class="section-title">Recommended jobs</div><div class="section-copy">AI-ranked roles based on your current profile and resume signals.</div></div>
+                            <a href="{% url 'job_list' %}" class="btn btn-outline-primary">Explore all jobs</a>
+                        </div>
+                        {% if recommended_jobs %}
+                            <div class="cards-2">
+                                {% for job in recommended_jobs %}
+                                    <div class="box">
+                                        <div class="d-flex justify-content-between gap-3 align-items-start">
+                                            <div><div class="fw-semibold">{{ job.title }}</div><div class="text-muted small">{{ job.company }} - {{ job.location }}</div></div>
+                                            <span class="chip">{{ job.match_percentage|floatformat:0 }}%</span>
+                                        </div>
+                                        <p class="text-muted small mt-3 mb-0">{{ job.description|truncatewords:20 }}</p>
+                                        <div class="job-skills mt-3">{% for skill in job.get_skills_list|slice:":4" %}<span>{{ skill }}</span>{% endfor %}</div>
+                                        <div class="d-flex flex-wrap gap-2 mt-3">
+                                            <a href="{% url 'job_detail' job.id %}" class="btn btn-sm btn-primary">View Job</a>
+                                            <form method="post" action="{% url 'toggle_save_job_legacy' job.id %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="next" value="{% url 'dashboard' %}">
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary">{% if job.is_saved %}Saved{% else %}Save Job{% endif %}</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty">Upload a resume and add skills to unlock personalized recommendations.</div>
+                        {% endif %}
+                    </section>
+
+                    <section class="n-card section-card" id="saved">
+                        <div class="section-head">
+                            <div><div class="section-title">Saved jobs</div><div class="section-copy">Shortlisted roles stay one click away.</div></div>
+                            <a href="{% url 'saved_jobs' %}" class="btn btn-outline-primary">View all</a>
+                        </div>
+                        {% if saved_jobs %}
+                            <div class="cards-2">
+                                {% for saved in saved_jobs|slice:":4" %}
+                                    <div class="box">
+                                        <div class="fw-semibold">{{ saved.job.title }}</div>
+                                        <div class="text-muted small">{{ saved.job.company }} - {{ saved.job.location }}</div>
+                                        <div class="d-flex flex-wrap gap-2 mt-3">
+                                            <a href="{% url 'job_detail' saved.job.id %}" class="btn btn-sm btn-outline-primary">Open</a>
+                                            <span class="status-pill {% if saved.application_status == 'Applied' %}s-applied{% elif saved.application_status == 'Under Review' %}s-review{% elif saved.application_status == 'Interview Scheduled' or saved.application_status == 'Interview Completed' %}s-interview{% elif saved.application_status == 'Selected' %}s-selected{% elif saved.application_status == 'Rejected' %}s-rejected{% else %}s-applied{% endif %}">{{ saved.application_status|default:"Not applied" }}</span>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty">Save jobs to build your shortlist.</div>
+                        {% endif %}
+                    </section>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="activity-panel" role="tabpanel">
+            <div class="stack mt-4">
+                <section class="n-card section-card">
+                    <div class="section-head">
+                        <div><div class="section-title">Activity insights</div><div class="section-copy">Bar chart and pie chart are back using the same current dashboard data.</div></div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="box score"><strong>{{ total_applications }}</strong><span class="muted">Total applications</span></div>
+                        <div class="box score"><strong>{{ average_match|floatformat:0 }}%</strong><span class="muted">Average match</span></div>
+                        <div class="box score"><strong>{{ resume_score|floatformat:0 }}%</strong><span class="muted">Resume score</span></div>
+                        <div class="box score"><strong>{{ profile_completion|floatformat:0 }}%</strong><span class="muted">Profile completion</span></div>
+                    </div>
+                </section>
+
+                <section class="cards-2">
+                    <div class="n-card section-card chart-box">
+                        <div class="section-head"><div><div class="section-title">Application pipeline bar chart</div><div class="section-copy">How many applications sit in each stage.</div></div></div>
+                        <canvas id="applicationBarChart"></canvas>
+                    </div>
+                    <div class="n-card section-card chart-box">
+                        <div class="section-head"><div><div class="section-title">Status distribution pie chart</div><div class="section-copy">Quick share of your current application states.</div></div></div>
+                        <canvas id="statusPieChart"></canvas>
+                    </div>
+                </section>
+
+                <section class="cards-2">
+                    <div class="n-card section-card interview-box">
+                        <div class="section-head"><div><div class="section-title">Interview readiness</div><div class="section-copy">{% if upcoming_interview %}Your next interview is ready to open from here.{% else %}No interview is scheduled right now.{% endif %}</div></div></div>
+                        {% if upcoming_interview %}
+                            <div class="box" style="background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.16);">
+                                <div class="fw-semibold">{{ upcoming_interview.job.title }}</div>
+                                <div class="muted">{{ upcoming_interview.job.company }} - {{ upcoming_interview.interview_date|date:"M d, Y h:i A" }}</div>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2 mt-3">
+                                <a href="{% url 'interview' upcoming_interview.id %}" class="btn btn-light">Open Interview Room</a>
+                                <a href="{% url 'job_detail' upcoming_interview.job.id %}" class="btn btn-outline-light">View Job</a>
+                            </div>
+                        {% else %}
+                            <div class="empty" style="background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.16); color: rgba(255,255,255,.88);">No interview is scheduled right now.</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="n-card section-card">
+                        <div class="section-head"><div><div class="section-title">Best current signal</div><div class="section-copy">Strongest role or metric on your dashboard right now.</div></div></div>
+                        {% if top_match %}
+                            <div class="box">
+                                <div class="label">Top matched role</div>
+                                <div class="fw-semibold">{{ top_match.job.title }}</div>
+                                <div class="text-muted small">{{ top_match.job.company }} - {{ top_match.job.location }}</div>
+                                <div class="stats-grid mt-3">
+                                    <div class="box score"><strong>{{ top_match.match_percentage|floatformat:0 }}%</strong><span class="muted">Match</span></div>
+                                    <div class="box score"><strong>{{ top_match.resume_score|floatformat:0 }}%</strong><span class="muted">Resume</span></div>
+                                    <div class="box score"><strong>{% if top_match.interview_score %}{{ top_match.interview_score|floatformat:0 }}%{% else %}--{% endif %}</strong><span class="muted">Interview</span></div>
+                                    <div class="box score"><strong>{{ top_match.status }}</strong><span class="muted">Stage</span></div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="empty">Apply to jobs to unlock richer AI insights here.</div>
+                        {% endif %}
+                    </div>
+                </section>
+
+                <section class="n-card section-card">
+                    <div class="section-head"><div><div class="section-title">Recent activity timeline</div><div class="section-copy">Track your latest dashboard events in one place.</div></div></div>
+                    {% if recent_events %}
+                        <div class="timeline">
+                            {% for event in recent_events %}
+                                <div class="box">
+                                    <div><div class="fw-semibold">{{ event.application.job.title }} - {{ event.status }}</div><div class="text-muted small">{{ event.note|default:"Status updated" }}</div></div>
+                                    <div class="text-muted small">{{ event.created_at|date:"M d, Y H:i" }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty">Your timeline will appear here as applications move through the pipeline.</div>
+                    {% endif %}
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const labels = ['Applied', 'Under Review', 'Interview Scheduled', 'Interview Completed', 'Selected', 'Rejected'];
+    const counts = [{{ applied_count }}, {{ under_review_count }}, {{ interview_scheduled_count }}, {{ interview_completed_count }}, {{ selected_count }}, {{ rejected_count }}];
+    const colors = ['#3b82f6', '#f59e0b', '#8b5cf6', '#06b6d4', '#22c55e', '#ef4444'];
+    if (typeof Chart === 'undefined') return;
+    const barCtx = document.getElementById('applicationBarChart');
+    const pieCtx = document.getElementById('statusPieChart');
+    if (!barCtx || !pieCtx) return;
+
+    const barChart = new Chart(barCtx, {
+        type: 'bar',
+        data: { labels: labels, datasets: [{ data: counts, backgroundColor: colors, borderRadius: 14, borderSkipped: false }] },
+        options: {
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: '#64748b', font: { weight: '600' } } },
+                y: { beginAtZero: true, ticks: { precision: 0, color: '#64748b' }, grid: { color: 'rgba(148,163,184,.16)' } }
+            }
+        }
+    });
+
+    const hasData = counts.some(function (value) { return value > 0; });
+    const pieChart = new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+            labels: hasData ? labels : ['No applications yet'],
+            datasets: [{
+                data: hasData ? counts : [1],
+                backgroundColor: hasData ? colors : ['#dbeafe'],
+                borderColor: '#ffffff',
+                borderWidth: 3
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: '#475569', padding: 16, usePointStyle: true, pointStyle: 'circle' }
+                }
+            }
+        }
+    });
+
+    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(function (tab) {
+        tab.addEventListener('shown.bs.tab', function () {
+            barChart.resize();
+            pieChart.resize();
+        });
+    });
+});
+</script>
+{% endblock %}

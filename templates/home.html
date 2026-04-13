@@ -1,0 +1,1168 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
+
+    .home-page {
+        --home-navy-900: #061a2f;
+        --home-navy-800: #0d2d4e;
+        --home-navy-700: #1e4873;
+        --home-cyan-400: #41c4d7;
+        --home-cyan-300: #81d8e4;
+        --home-gold-400: #f2b94b;
+        --home-surface: #ffffff;
+        --home-surface-soft: #f1f7fb;
+        --home-text: #0d233c;
+        --home-muted: #5a6f87;
+        --home-border: rgba(13, 45, 78, 0.14);
+        --home-shadow: 0 24px 58px rgba(6, 26, 47, 0.16);
+        color: var(--home-text);
+        width: 100vw;
+        margin-left: calc(50% - 50vw);
+        margin-right: calc(50% - 50vw);
+        margin-top: -1rem;
+        overflow: hidden;
+        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    }
+
+    .home-page,
+    .home-page * {
+        box-sizing: border-box;
+    }
+
+    .home-page section {
+        position: relative;
+    }
+
+    .home-page .section-padding {
+        padding: 5.5rem 0;
+    }
+
+    .home-page h1,
+    .home-page h2,
+    .home-page h3,
+    .home-page h4,
+    .home-page h5 {
+        font-family: "Space Grotesk", "Segoe UI", sans-serif;
+        letter-spacing: -0.02em;
+    }
+
+    .home-page .section-heading {
+        max-width: 720px;
+        margin: 0 auto 3.1rem;
+        text-align: center;
+    }
+
+    .home-page .section-heading .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        padding: 0.5rem 0.9rem;
+        border-radius: 999px;
+        border: 1px solid rgba(65, 196, 215, 0.34);
+        background: rgba(65, 196, 215, 0.08);
+        color: var(--home-navy-700);
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+    }
+
+    .home-page .section-heading h2 {
+        margin: 1.1rem 0 0.85rem;
+        font-size: clamp(2rem, 3vw, 3.15rem);
+        line-height: 1.1;
+        color: var(--home-text);
+    }
+
+    .home-page .section-heading p {
+        margin: 0;
+        color: var(--home-muted);
+        font-size: 1.02rem;
+        line-height: 1.75;
+    }
+
+    .hero-section {
+        background:
+            radial-gradient(circle at 12% 18%, rgba(65, 196, 215, 0.27), transparent 34%),
+            radial-gradient(circle at 88% 80%, rgba(242, 185, 75, 0.2), transparent 26%),
+            linear-gradient(124deg, #e8f4f8 0%, #e4eef8 44%, #f8fbfd 100%);
+        padding: 6.6rem 0 2.2rem;
+    }
+
+    .hero-section::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+            linear-gradient(rgba(6, 26, 47, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(6, 26, 47, 0.03) 1px, transparent 1px);
+        background-size: 38px 38px;
+        pointer-events: none;
+    }
+
+    .hero-grid {
+        position: relative;
+        z-index: 1;
+        align-items: center;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-bottom: 1.6rem;
+        padding: 0.6rem 1rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(13, 45, 78, 0.16);
+        color: var(--home-navy-800);
+        font-size: 0.88rem;
+        font-weight: 700;
+        box-shadow: 0 12px 26px rgba(13, 45, 78, 0.08);
+    }
+
+    .hero-copy h1 {
+        font-size: clamp(2.5rem, 5vw, 4.6rem);
+        line-height: 1.02;
+        font-weight: 700;
+        margin-bottom: 1.25rem;
+        color: var(--home-navy-900);
+    }
+
+    .hero-copy .highlight {
+        color: var(--home-navy-700);
+        position: relative;
+    }
+
+    .hero-copy .highlight::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0.2rem;
+        width: 100%;
+        height: 0.45rem;
+        background: rgba(65, 196, 215, 0.25);
+        z-index: -1;
+        border-radius: 999px;
+    }
+
+    .hero-copy p {
+        max-width: 620px;
+        margin-bottom: 1.7rem;
+        color: var(--home-muted);
+        font-size: 1.05rem;
+        line-height: 1.82;
+    }
+
+    .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.95rem;
+        margin-bottom: 1.9rem;
+    }
+
+    .hero-actions .btn,
+    .cta-actions .btn {
+        border-radius: 13px;
+        font-weight: 700;
+        padding: 0.88rem 1.35rem;
+        transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease, color 0.25s ease;
+    }
+
+    .hero-actions .btn:hover,
+    .cta-actions .btn:hover {
+        transform: translateY(-3px);
+    }
+
+    .btn-hero-primary {
+        border: none;
+        color: #fff;
+        background: linear-gradient(130deg, var(--home-navy-800), var(--home-navy-700));
+        box-shadow: 0 16px 30px rgba(13, 45, 78, 0.22);
+    }
+
+    .btn-hero-secondary {
+        border: 1px solid rgba(13, 45, 78, 0.18);
+        background: rgba(255, 255, 255, 0.94);
+        color: var(--home-navy-800);
+    }
+
+    .hero-proof {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(120px, 1fr));
+        gap: 0.85rem;
+        max-width: 560px;
+    }
+
+    .hero-proof .proof-card {
+        padding: 0.9rem 0.75rem;
+        border-radius: 16px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.87);
+        border: 1px solid rgba(13, 45, 78, 0.1);
+    }
+
+    .hero-proof .proof-card strong {
+        display: block;
+        color: var(--home-navy-800);
+        font-family: "Space Grotesk", "Segoe UI", sans-serif;
+        font-size: 1.15rem;
+        line-height: 1;
+        margin-bottom: 0.28rem;
+    }
+
+    .hero-proof .proof-card span {
+        color: var(--home-muted);
+        font-size: 0.83rem;
+    }
+
+    .hero-visual {
+        position: relative;
+    }
+
+    .hero-card {
+        position: relative;
+        z-index: 2;
+        border-radius: 30px;
+        background: linear-gradient(165deg, #ffffff 0%, #edf6fb 100%);
+        border: 1px solid rgba(13, 45, 78, 0.1);
+        box-shadow: var(--home-shadow);
+        padding: 1.55rem;
+        animation: riseIn 0.65s ease;
+    }
+
+    .hero-card-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.2rem;
+    }
+
+    .hero-card-top .title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--home-navy-800);
+    }
+
+    .hero-card-top .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        background: rgba(54, 179, 126, 0.14);
+        color: #0f7d4c;
+    }
+
+    .hero-profile {
+        display: grid;
+        grid-template-columns: 72px 1fr;
+        gap: 1rem;
+        align-items: center;
+        padding: 1rem;
+        border-radius: 20px;
+        background: #fff;
+        border: 1px solid rgba(13, 45, 78, 0.1);
+        margin-bottom: 1rem;
+    }
+
+    .hero-profile-avatar {
+        width: 72px;
+        height: 72px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.55rem;
+        background: linear-gradient(140deg, var(--home-navy-800), var(--home-cyan-400));
+    }
+
+    .hero-profile h3 {
+        margin: 0 0 0.24rem;
+        font-size: 1.08rem;
+        color: var(--home-navy-800);
+    }
+
+    .hero-profile p {
+        margin: 0;
+        color: var(--home-muted);
+        font-size: 0.9rem;
+    }
+
+    .match-score {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 0.8rem;
+        align-items: center;
+        padding: 1rem;
+        margin-bottom: 0.95rem;
+        border-radius: 18px;
+        background: rgba(13, 45, 78, 0.04);
+        border: 1px solid rgba(13, 45, 78, 0.1);
+    }
+
+    .match-score .icon {
+        width: 46px;
+        height: 46px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        color: var(--home-navy-700);
+        background: rgba(65, 196, 215, 0.2);
+    }
+
+    .match-score h4 {
+        margin: 0 0 0.2rem;
+        font-size: 0.96rem;
+        font-weight: 700;
+        color: var(--home-navy-800);
+    }
+
+    .match-score p {
+        margin: 0;
+        color: var(--home-muted);
+        font-size: 0.85rem;
+    }
+
+    .match-score strong {
+        color: var(--home-navy-800);
+        font-size: 1.45rem;
+        font-weight: 700;
+    }
+
+    .hero-list {
+        display: grid;
+        gap: 0.75rem;
+    }
+
+    .hero-list-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.9rem;
+        padding: 0.88rem 0.95rem;
+        border-radius: 16px;
+        background: #ffffff;
+        border: 1px solid rgba(13, 45, 78, 0.1);
+    }
+
+    .hero-list-item .company {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+
+    .hero-list-item .company-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--home-navy-700);
+        background: rgba(65, 196, 215, 0.16);
+    }
+
+    .hero-list-item h5 {
+        margin: 0;
+        font-size: 0.94rem;
+        color: var(--home-navy-800);
+    }
+
+    .hero-list-item span {
+        display: block;
+        color: var(--home-muted);
+        font-size: 0.82rem;
+    }
+
+    .badge-soft {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 0.35rem 0.68rem;
+        font-size: 0.78rem;
+        font-weight: 700;
+        white-space: nowrap;
+        background: rgba(242, 185, 75, 0.18);
+        color: #7d5600;
+    }
+
+    .floating-chip {
+        position: absolute;
+        z-index: 1;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        padding: 0.75rem 0.9rem;
+        border-radius: 16px;
+        border: 1px solid rgba(13, 45, 78, 0.14);
+        background: rgba(255, 255, 255, 0.95);
+        font-size: 0.84rem;
+        font-weight: 700;
+        color: var(--home-navy-800);
+        box-shadow: 0 15px 30px rgba(13, 45, 78, 0.14);
+        animation: floatChip 5.4s ease-in-out infinite;
+    }
+
+    .floating-chip i {
+        color: var(--home-navy-700);
+    }
+
+    .chip-top {
+        top: 8%;
+        right: -7%;
+    }
+
+    .chip-bottom {
+        bottom: 10%;
+        left: -8%;
+        animation-delay: 1.1s;
+    }
+
+    .trusted-strip {
+        padding: 2rem 0 2.7rem;
+    }
+
+    .trusted-panel {
+        border-radius: 22px;
+        background: #fff;
+        border: 1px solid rgba(13, 45, 78, 0.12);
+        box-shadow: 0 16px 38px rgba(13, 45, 78, 0.08);
+        padding: 1.2rem 1.4rem;
+    }
+
+    .trusted-panel p {
+        margin: 0;
+        color: var(--home-muted);
+        font-size: 0.9rem;
+    }
+
+    .trusted-logos {
+        margin-top: 0.95rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+    }
+
+    .trusted-logos span {
+        padding: 0.42rem 0.7rem;
+        border-radius: 10px;
+        border: 1px dashed rgba(13, 45, 78, 0.2);
+        color: var(--home-navy-700);
+        background: rgba(65, 196, 215, 0.06);
+        font-size: 0.8rem;
+        font-weight: 700;
+    }
+
+    .features-section {
+        background: var(--home-surface);
+    }
+
+    .feature-card {
+        height: 100%;
+        border-radius: 22px;
+        border: 1px solid var(--home-border);
+        background: linear-gradient(180deg, #ffffff 0%, #f6fbfd 100%);
+        box-shadow: 0 14px 35px rgba(6, 26, 47, 0.08);
+        padding: 1.85rem;
+        transition: transform 0.28s ease, box-shadow 0.28s ease;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-7px);
+        box-shadow: 0 21px 45px rgba(6, 26, 47, 0.15);
+    }
+
+    .feature-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        color: var(--home-navy-700);
+        font-size: 1.25rem;
+        background: linear-gradient(140deg, rgba(65, 196, 215, 0.22), rgba(242, 185, 75, 0.2));
+    }
+
+    .feature-card h3 {
+        margin-bottom: 0.62rem;
+        font-size: 1.15rem;
+        color: var(--home-navy-800);
+    }
+
+    .feature-card p {
+        margin: 0;
+        color: var(--home-muted);
+        line-height: 1.72;
+    }
+
+    .process-section {
+        background: linear-gradient(180deg, #f3f8fb 0%, #ffffff 100%);
+    }
+
+    .process-line {
+        position: relative;
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .process-line::before {
+        content: "";
+        position: absolute;
+        top: 2rem;
+        left: 4%;
+        right: 4%;
+        height: 2px;
+        background: linear-gradient(90deg, rgba(13, 45, 78, 0.18), rgba(65, 196, 215, 0.45), rgba(13, 45, 78, 0.18));
+        z-index: 0;
+    }
+
+    .step-card {
+        position: relative;
+        z-index: 1;
+        height: 100%;
+        padding: 1.9rem 1.4rem;
+        border-radius: 20px;
+        background: #fff;
+        border: 1px solid var(--home-border);
+        box-shadow: 0 14px 34px rgba(6, 26, 47, 0.08);
+    }
+
+    .step-number {
+        width: 52px;
+        height: 52px;
+        margin-bottom: 1rem;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: #fff;
+        background: linear-gradient(130deg, var(--home-navy-700), var(--home-cyan-400));
+    }
+
+    .step-card h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.55rem;
+        color: var(--home-navy-800);
+    }
+
+    .step-card p {
+        margin: 0;
+        color: var(--home-muted);
+        line-height: 1.68;
+        font-size: 0.95rem;
+    }
+
+    .stats-section {
+        background: #fff;
+    }
+
+    .stat-card {
+        height: 100%;
+        text-align: center;
+        padding: 1.9rem 1.3rem;
+        border-radius: 20px;
+        border: 1px solid var(--home-border);
+        background: linear-gradient(180deg, #ffffff 0%, #f6fbfd 100%);
+        box-shadow: 0 12px 30px rgba(6, 26, 47, 0.07);
+        transition: transform 0.26s ease, box-shadow 0.26s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 42px rgba(6, 26, 47, 0.14);
+    }
+
+    .stat-icon {
+        width: 66px;
+        height: 66px;
+        margin: 0 auto 1rem;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--home-navy-700);
+        font-size: 1.3rem;
+        background: linear-gradient(135deg, rgba(65, 196, 215, 0.22), rgba(242, 185, 75, 0.2));
+    }
+
+    .stat-number {
+        font-size: clamp(2rem, 3vw, 2.7rem);
+        font-weight: 700;
+        line-height: 1;
+        margin-bottom: 0.62rem;
+        color: var(--home-navy-800);
+    }
+
+    .stat-label {
+        margin: 0;
+        color: var(--home-muted);
+        font-weight: 600;
+    }
+
+    .cta-section {
+        padding: 0 0 6rem;
+        background: linear-gradient(180deg, #ffffff 0%, #edf6fb 100%);
+    }
+
+    .cta-panel {
+        position: relative;
+        overflow: hidden;
+        border-radius: 30px;
+        padding: 3rem;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: linear-gradient(135deg, #08223d 0%, #0d2d4e 44%, #1e4873 100%);
+        box-shadow: 0 28px 72px rgba(6, 26, 47, 0.25);
+    }
+
+    .cta-panel::before,
+    .cta-panel::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(129, 216, 228, 0.18);
+        filter: blur(1px);
+    }
+
+    .cta-panel::before {
+        width: 280px;
+        height: 280px;
+        top: -120px;
+        right: -90px;
+    }
+
+    .cta-panel::after {
+        width: 210px;
+        height: 210px;
+        left: -70px;
+        bottom: -80px;
+    }
+
+    .cta-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .cta-content h2 {
+        color: #fff;
+        font-size: clamp(2rem, 3vw, 3rem);
+        line-height: 1.1;
+        margin-bottom: 0.9rem;
+    }
+
+    .cta-content p {
+        max-width: 680px;
+        margin-bottom: 1.7rem;
+        color: rgba(255, 255, 255, 0.86);
+        line-height: 1.75;
+        font-size: 1.02rem;
+    }
+
+    .cta-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .btn-cta-light {
+        border: none;
+        background: #fff;
+        color: var(--home-navy-800);
+    }
+
+    .btn-cta-outline {
+        border: 1px solid rgba(255, 255, 255, 0.45);
+        background: transparent;
+        color: #fff;
+    }
+
+    .reveal {
+        opacity: 0;
+        transform: translateY(18px);
+        transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+
+    .reveal.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    @keyframes floatChip {
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-9px);
+        }
+    }
+
+    @keyframes riseIn {
+        from {
+            opacity: 0;
+            transform: translateY(18px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 1199.98px) {
+        .chip-top {
+            right: -2%;
+        }
+
+        .chip-bottom {
+            left: -3%;
+        }
+    }
+
+    @media (max-width: 991.98px) {
+        .hero-section {
+            padding-top: 5rem;
+        }
+
+        .hero-copy {
+            margin-bottom: 2.4rem;
+        }
+
+        .process-line {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .process-line::before {
+            display: none;
+        }
+
+        .chip-top,
+        .chip-bottom {
+            position: static;
+            margin-top: 0.8rem;
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .home-page {
+            margin-top: -0.5rem;
+        }
+
+        .home-page .section-padding {
+            padding: 4rem 0;
+        }
+
+        .hero-section {
+            padding: 4.4rem 0 2rem;
+        }
+
+        .hero-actions,
+        .cta-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .hero-actions .btn,
+        .cta-actions .btn {
+            width: 100%;
+        }
+
+        .hero-card,
+        .cta-panel,
+        .trusted-panel {
+            padding: 1.5rem;
+        }
+
+        .hero-proof {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-profile,
+        .match-score,
+        .hero-list-item {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+
+        .hero-list-item {
+            display: grid;
+            justify-items: center;
+        }
+
+        .process-line {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="home-page">
+    <section class="hero-section">
+        <div class="container">
+            <div class="row hero-grid g-5">
+                <div class="col-lg-6 hero-copy reveal">
+                    <div class="hero-badge">
+                        <i class="fa-solid fa-industry"></i>
+                        Enterprise-grade AI hiring platform
+                    </div>
+                    <h1>Design better hiring pipelines with <span class="highlight">precision AI matching</span></h1>
+                    <p>
+                        Build a confident recruitment engine with resume intelligence, role-fit scoring, candidate verification,
+                        and real-time recommendation workflows for modern recruitment teams.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="{% url 'job_list' %}" class="btn btn-hero-primary" onclick="checkLogin(event)">
+                            <i class="fa-solid fa-briefcase me-2"></i>Explore Jobs
+                        </a>
+                        <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'register' %}{% endif %}" class="btn btn-hero-secondary">
+                            <i class="fa-solid fa-file-arrow-up me-2"></i>Upload Resume
+                        </a>
+                    </div>
+                    <div class="hero-proof">
+                        <div class="proof-card">
+                            <strong>94%</strong>
+                            <span>Avg. role-fit accuracy</span>
+                        </div>
+                        <div class="proof-card">
+                            <strong>2.7x</strong>
+                            <span>Faster shortlist cycles</span>
+                        </div>
+                        <div class="proof-card">
+                            <strong>24/7</strong>
+                            <span>Smart recommendation loop</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 hero-visual reveal">
+                    <div class="floating-chip chip-top">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        Candidate verification pipeline active
+                    </div>
+                    <div class="hero-card">
+                        <div class="hero-card-top">
+                            <div class="title">Hiring Intelligence Snapshot</div>
+                            <div class="status">
+                                <i class="fa-solid fa-circle-check"></i>
+                                Active Match
+                            </div>
+                        </div>
+
+                        <div class="hero-profile">
+                            <div class="hero-profile-avatar">
+                                <i class="fa-solid fa-user-tie"></i>
+                            </div>
+                            <div>
+                                <h3>Candidate Intelligence Profile</h3>
+                                <p>Skills, experience depth, and role compatibility surfaced in a single live profile.</p>
+                            </div>
+                        </div>
+
+                        <div class="match-score">
+                            <div class="icon">
+                                <i class="fa-solid fa-chart-line"></i>
+                            </div>
+                            <div>
+                                <h4>Top match: Machine Learning Engineer</h4>
+                                <p>Calculated from resume semantics, domain overlap, and interview-readiness checks.</p>
+                            </div>
+                            <strong>94%</strong>
+                        </div>
+
+                        <div class="hero-list">
+                            <div class="hero-list-item">
+                                <div class="company">
+                                    <div class="company-icon">
+                                        <i class="fa-solid fa-building"></i>
+                                    </div>
+                                    <div>
+                                        <h5>Product AI Analyst</h5>
+                                        <span>Skill fit, collaboration score, and portfolio signal</span>
+                                    </div>
+                                </div>
+                                <div class="badge-soft">High Priority</div>
+                            </div>
+                            <div class="hero-list-item">
+                                <div class="company">
+                                    <div class="company-icon">
+                                        <i class="fa-solid fa-user-check"></i>
+                                    </div>
+                                    <div>
+                                        <h5>Interview Verification Ready</h5>
+                                        <span>Identity validation and confidence scoring</span>
+                                    </div>
+                                </div>
+                                <div class="badge-soft">Secure</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="floating-chip chip-bottom">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        Recruiter dashboard synced in real time
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="trusted-strip">
+        <div class="container">
+            <div class="trusted-panel reveal">
+                <p>Trusted by fast-scaling teams to reduce hiring noise and improve quality-of-hire decisions.</p>
+                <div class="trusted-logos">
+                    <span>AI Product Teams</span>
+                    <span>Enterprise HR Units</span>
+                    <span>Digital Transformation Offices</span>
+                    <span>Recruitment Operations</span>
+                    <span>Campus Hiring Programs</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section section-padding">
+        <div class="container">
+            <div class="section-heading reveal">
+                <span class="eyebrow"><i class="fa-solid fa-table-cells-large"></i> Platform Capabilities</span>
+                <h2>Built for recruiters, candidates, and high-volume hiring operations</h2>
+                <p>
+                    A consolidated workspace for recommendation quality, screening confidence,
+                    and measurable hiring outcomes across the full candidate journey.
+                </p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-xl-3">
+                    <div class="feature-card reveal">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <h3>AI Job Recommendation</h3>
+                        <p>Rank opportunities with context-aware matching models tuned for role, skill, and domain relevance.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="feature-card reveal">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-file-magnifying-glass"></i>
+                        </div>
+                        <h3>Resume Analysis</h3>
+                        <p>Convert resumes into structured intelligence with strengths, gap indicators, and role alignment scores.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="feature-card reveal">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-camera-retro"></i>
+                        </div>
+                        <h3>Online Interview Verification</h3>
+                        <p>Support remote interview trust using secure identity verification and authenticity checkpoints.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="feature-card reveal">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-chart-pie"></i>
+                        </div>
+                        <h3>HR Dashboard</h3>
+                        <p>Track application funnels, match quality, and interview outcomes from a single operational dashboard.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="process-section section-padding">
+        <div class="container">
+            <div class="section-heading reveal">
+                <span class="eyebrow"><i class="fa-solid fa-route"></i> Workflow</span>
+                <h2>From onboarding to interview, built as one connected hiring flow</h2>
+                <p>
+                    The system removes repetitive work and keeps recruitment teams focused on better hiring decisions.
+                </p>
+            </div>
+            <div class="process-line">
+                <div class="step-card reveal">
+                        <div class="step-number">01</div>
+                        <h3>Register Account</h3>
+                        <p>Create an account and initialize your role, preferences, and hiring profile context.</p>
+                </div>
+                <div class="step-card reveal">
+                        <div class="step-number">02</div>
+                        <h3>Upload Resume</h3>
+                        <p>Submit resume data to extract role signals, technical depth, and qualification readiness.</p>
+                </div>
+                <div class="step-card reveal">
+                        <div class="step-number">03</div>
+                        <h3>Get Job Recommendations</h3>
+                        <p>Receive ranked opportunities based on semantic skill matching and behavioral compatibility.</p>
+                </div>
+                <div class="step-card reveal">
+                        <div class="step-number">04</div>
+                        <h3>Apply and Attend Interview</h3>
+                        <p>Move shortlisted candidates through verified interviews with transparent status tracking.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats-section section-padding">
+        <div class="container">
+            <div class="section-heading reveal">
+                <span class="eyebrow"><i class="fa-solid fa-chart-column"></i> Measurable Impact</span>
+                <h2>Operational metrics that demonstrate hiring performance at scale</h2>
+                <p>
+                    Real-time indicators make it easy to track adoption, hiring volume, and successful placements.
+                </p>
+            </div>
+            <div class="row g-4">
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card reveal">
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-briefcase"></i>
+                        </div>
+                        <div class="stat-number" data-counter data-target="{{ total_jobs|default:'1200' }}">0</div>
+                        <p class="stat-label">Total Jobs</p>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card reveal">
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-building"></i>
+                        </div>
+                        <div class="stat-number" data-counter data-target="{{ companies_count|default:'180' }}">0</div>
+                        <p class="stat-label">Companies</p>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card reveal">
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <div class="stat-number" data-counter data-target="{{ candidates_count|default:'3200' }}">0</div>
+                        <p class="stat-label">Candidates</p>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card reveal">
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-handshake-angle"></i>
+                        </div>
+                        <div class="stat-number" data-counter data-target="{{ placements_count|default:'940' }}">0</div>
+                        <p class="stat-label">Successful Placements</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-panel reveal">
+                <div class="cta-content">
+                    <h2>Upgrade hiring quality with a professional AI recommendation workflow</h2>
+                    <p>
+                        Activate your profile, upload candidate data, and start matching with confidence using a unified,
+                        industry-focused hiring platform.
+                    </p>
+                    <div class="cta-actions">
+                        <a href="{% url 'register' %}" class="btn btn-cta-light">
+                            <i class="fa-solid fa-user-plus me-2"></i>Register Now
+                        </a>
+                        <a href="{% url 'job_list' %}" class="btn btn-cta-outline" onclick="checkLogin(event)">
+                            <i class="fa-solid fa-briefcase me-2"></i>Explore Jobs
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+    function checkLogin(event) {
+        const isAuthenticated = "{{ request.user.is_authenticated }}";
+
+        if (isAuthenticated === "False") {
+            event.preventDefault();
+            alert("Login Required\n\nPlease login to explore job opportunities.");
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const counters = document.querySelectorAll("[data-counter]");
+        const revealElements = document.querySelectorAll(".reveal");
+
+        if ("IntersectionObserver" in window && revealElements.length) {
+            const revealObserver = new IntersectionObserver(function (entries, observer) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("is-visible");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.18 });
+
+            revealElements.forEach(function (element) {
+                revealObserver.observe(element);
+            });
+        } else {
+            revealElements.forEach(function (element) {
+                element.classList.add("is-visible");
+            });
+        }
+
+        if (!counters.length || !("IntersectionObserver" in window)) {
+            counters.forEach(function (counter) {
+                counter.textContent = counter.getAttribute("data-target");
+            });
+            return;
+        }
+
+        const animateCounter = function (counter) {
+            const target = parseInt(counter.getAttribute("data-target"), 10) || 0;
+            const duration = 1400;
+            const startTime = performance.now();
+
+            const step = function (now) {
+                const progress = Math.min((now - startTime) / duration, 1);
+                const current = Math.floor(progress * target);
+                counter.textContent = current.toLocaleString();
+
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    counter.textContent = target.toLocaleString();
+                }
+            };
+
+            window.requestAnimationFrame(step);
+        };
+
+        const observer = new IntersectionObserver(function (entries, currentObserver) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    animateCounter(entry.target);
+                    currentObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.35 });
+
+        counters.forEach(function (counter) {
+            observer.observe(counter);
+        });
+    });
+</script>
+
+
+{% endblock %}
+ 

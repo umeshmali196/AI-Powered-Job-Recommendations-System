@@ -1,0 +1,833 @@
+{% extends 'base.html' %}
+
+{% block body_class %}job-detail-screen{% endblock %}
+{% block page_container_class %}job-detail-shell{% endblock %}
+
+{% block extra_head %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Manrope:wght@600;700;800&display=swap');
+
+    .job-detail-screen {
+        background:
+            linear-gradient(180deg, #f3f7fb 0%, #eef3f8 100%);
+        font-family: 'DM Sans', sans-serif;
+    }
+
+    .job-detail-shell {
+        width: 100%;
+        padding: 1.15rem 1rem 3rem;
+        margin-top: 0;
+    }
+
+    .job-detail-page {
+        max-width: 1320px;
+        margin: 0 auto;
+    }
+
+    .job-summary-card,
+    .job-content-card,
+    .job-sidebar-card,
+    .job-similar-card {
+        background: #ffffff;
+        border: 1px solid #dbe4ef;
+        border-radius: 24px;
+        box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
+    }
+
+    .job-summary-card {
+        padding: 1.6rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .job-summary-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.45fr) minmax(240px, 0.7fr);
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    .job-summary-topline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 0.85rem;
+    }
+
+    .job-summary-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.42rem 0.85rem;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .job-summary-date {
+        color: #64748b;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .job-summary-title {
+        margin: 0 0 0.45rem;
+        color: #0f172a;
+        font-family: 'Manrope', sans-serif;
+        font-size: clamp(1.85rem, 4vw, 2.8rem);
+        font-weight: 800;
+        line-height: 1.08;
+        letter-spacing: -0.03em;
+    }
+
+    .job-summary-company {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.15rem;
+        color: #334155;
+        font-size: 1.02rem;
+        font-weight: 700;
+    }
+
+    .job-summary-company span {
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .job-summary-meta {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .job-summary-meta-item {
+        display: flex;
+        gap: 0.8rem;
+        align-items: center;
+        padding: 0.95rem 1rem;
+        border-radius: 18px;
+        background: #f8fbff;
+        border: 1px solid #e2e8f0;
+    }
+
+    .job-summary-meta-icon {
+        width: 2.8rem;
+        height: 2.8rem;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #dbeafe, #eff6ff);
+        color: #2563eb;
+        flex-shrink: 0;
+    }
+
+    .job-summary-meta-label {
+        display: block;
+        color: #64748b;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 0.1rem;
+    }
+
+    .job-summary-meta-value {
+        color: #0f172a;
+        font-size: 0.98rem;
+        font-weight: 700;
+        line-height: 1.45;
+    }
+
+    .job-summary-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.7rem;
+    }
+
+    .job-summary-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.58rem 0.9rem;
+        border-radius: 999px;
+        background: #f8fafc;
+        border: 1px solid #dbe4ef;
+        color: #334155;
+        font-size: 0.88rem;
+        font-weight: 700;
+    }
+
+    .job-summary-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        min-width: 0;
+    }
+
+    .job-summary-actions form,
+    .job-summary-actions a {
+        width: 100%;
+    }
+
+    .job-primary-btn,
+    .job-secondary-btn,
+    .job-outline-btn {
+        width: 100%;
+        min-height: 52px;
+        border-radius: 16px;
+        font-weight: 800;
+    }
+
+    .job-primary-btn {
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        border: 0;
+        color: #ffffff;
+    }
+
+    .job-primary-btn:hover,
+    .job-primary-btn:focus {
+        color: #ffffff;
+        background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    }
+
+    .job-secondary-btn {
+        background: #eef4ff;
+        border: 1px solid #bfdbfe;
+        color: #1d4ed8;
+    }
+
+    .job-secondary-btn.saved {
+        background: #dbeafe;
+    }
+
+    .job-outline-btn {
+        background: #ffffff;
+        border: 1px solid #dbe4ef;
+        color: #334155;
+    }
+
+    .job-summary-note {
+        margin: 0;
+        padding: 0.85rem 1rem;
+        border-radius: 16px;
+        background: #f8fafc;
+        color: #64748b;
+        font-size: 0.9rem;
+        line-height: 1.6;
+    }
+
+    .job-detail-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.78fr);
+        gap: 1.25rem;
+        align-items: start;
+    }
+
+    .job-content-stack,
+    .job-sidebar-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 1.15rem;
+    }
+
+    .job-content-card,
+    .job-sidebar-card {
+        padding: 1.4rem;
+    }
+
+    .job-section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 0.95rem;
+    }
+
+    .job-section-title {
+        margin: 0;
+        color: #0f172a;
+        font-family: 'Manrope', sans-serif;
+        font-size: 1.32rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+
+    .job-section-marker {
+        color: #64748b;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+
+    .job-section-copy {
+        margin: 0;
+        color: #475569;
+        line-height: 1.85;
+    }
+
+    .job-skills-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.7rem;
+    }
+
+    .job-skill-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.68rem 0.95rem;
+        border-radius: 999px;
+        background: #f8fbff;
+        border: 1px solid #dbe4ef;
+        color: #1e293b;
+        font-weight: 700;
+    }
+
+    .role-details-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.9rem;
+    }
+
+    .role-detail-card {
+        padding: 1rem;
+        border-radius: 18px;
+        background: #f8fbff;
+        border: 1px solid #dbe4ef;
+    }
+
+    .role-detail-label {
+        display: block;
+        color: #64748b;
+        font-size: 0.76rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 0.35rem;
+    }
+
+    .role-detail-value {
+        margin: 0;
+        color: #0f172a;
+        font-size: 0.98rem;
+        font-weight: 700;
+        line-height: 1.6;
+    }
+
+    .job-company-box {
+        display: flex;
+        gap: 0.95rem;
+        align-items: flex-start;
+    }
+
+    .job-company-logo {
+        width: 72px;
+        height: 72px;
+        border-radius: 18px;
+        overflow: hidden;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8fafc;
+        border: 1px solid #dbe4ef;
+        flex-shrink: 0;
+    }
+
+    .job-company-logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .job-company-fallback {
+        color: #2563eb;
+        font-family: 'Manrope', sans-serif;
+        font-size: 1.4rem;
+        font-weight: 800;
+    }
+
+    .job-company-name {
+        margin: 0 0 0.3rem;
+        color: #0f172a;
+        font-size: 1.1rem;
+        font-weight: 800;
+    }
+
+    .job-company-copy {
+        margin: 0;
+        color: #475569;
+        line-height: 1.75;
+    }
+
+    .job-sidebar-list {
+        display: grid;
+        gap: 0.85rem;
+    }
+
+    .job-sidebar-item {
+        display: flex;
+        gap: 0.8rem;
+        align-items: flex-start;
+        padding: 0.95rem;
+        border-radius: 18px;
+        background: #f8fbff;
+        border: 1px solid #dbe4ef;
+    }
+
+    .job-sidebar-icon {
+        width: 2.55rem;
+        height: 2.55rem;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #eff6ff;
+        color: #2563eb;
+        flex-shrink: 0;
+    }
+
+    .job-sidebar-item strong {
+        display: block;
+        margin-bottom: 0.15rem;
+        color: #0f172a;
+    }
+
+    .job-sidebar-item span {
+        color: #475569;
+        line-height: 1.6;
+    }
+
+    .job-map-frame {
+        width: 100%;
+        height: 220px;
+        border: 0;
+        border-radius: 18px;
+        margin-top: 0.5rem;
+    }
+
+    .job-sidebar-link {
+        margin-top: 0.9rem;
+        border-radius: 14px;
+        font-weight: 700;
+    }
+
+    .job-similar-wrap {
+        margin-top: 1.2rem;
+    }
+
+    .job-similar-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+        margin-top: 0.9rem;
+    }
+
+    .job-similar-card {
+        padding: 1.15rem;
+    }
+
+    .job-similar-title {
+        margin: 0 0 0.35rem;
+        color: #0f172a;
+        font-size: 1.04rem;
+        font-weight: 800;
+    }
+
+    .job-similar-meta {
+        color: #64748b;
+        margin-bottom: 0.9rem;
+    }
+
+    .job-similar-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+    }
+
+    .job-similar-actions form,
+    .job-similar-actions a {
+        flex: 1 1 100%;
+    }
+
+    .job-similar-actions .btn {
+        width: 100%;
+        border-radius: 14px;
+        font-weight: 700;
+    }
+
+    .job-similar-actions .saved {
+        background: #eff6ff;
+        border-color: #bfdbfe;
+        color: #1d4ed8;
+    }
+
+    .job-empty-note {
+        margin: 0;
+        color: #64748b;
+    }
+
+    @media (max-width: 1199px) {
+        .job-summary-grid,
+        .job-detail-grid,
+        .job-similar-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .job-sidebar-stack {
+            position: static;
+        }
+    }
+
+    @media (min-width: 1200px) {
+        .job-sidebar-stack {
+            position: sticky;
+            top: 1.25rem;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .job-detail-shell {
+            padding: 1rem 0.8rem 2rem;
+        }
+
+        .job-summary-card,
+        .job-content-card,
+        .job-sidebar-card,
+        .job-similar-card {
+            border-radius: 20px;
+        }
+
+        .job-summary-card,
+        .job-content-card,
+        .job-sidebar-card {
+            padding: 1.1rem;
+        }
+
+        .job-summary-meta,
+        .role-details-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .job-summary-topline,
+        .job-company-box {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="job-detail-page">
+    <section class="job-summary-card">
+        <div class="job-summary-grid">
+            <div>
+                <div class="job-summary-topline">
+                    <span class="job-summary-eyebrow">
+                        <i class="fa-solid fa-briefcase"></i>
+                        Job Details
+                    </span>
+                    <span class="job-summary-date">Posted on {{ job.created_at|date:"M d, Y" }}</span>
+                </div>
+
+                <h1 class="job-summary-title">{{ job.title }}</h1>
+
+                <div class="job-summary-company">
+                    <div>{{ job.company }}</div>
+                    <span>{{ job.get_category_display }}</span>
+                </div>
+
+                <div class="job-summary-meta">
+                    <div class="job-summary-meta-item">
+                        <span class="job-summary-meta-icon"><i class="fa-solid fa-user-tie"></i></span>
+                        <div>
+                            <span class="job-summary-meta-label">Experience</span>
+                            <div class="job-summary-meta-value">
+                                {% if job.experience_required %}
+                                    {{ job.experience_required }}
+                                {% else %}
+                                    As per role fit
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="job-summary-meta-item">
+                        <span class="job-summary-meta-icon"><i class="fa-solid fa-indian-rupee-sign"></i></span>
+                        <div>
+                            <span class="job-summary-meta-label">Salary</span>
+                            <div class="job-summary-meta-value">
+                                {% if job.salary %}
+                                    {{ job.salary }}
+                                {% else %}
+                                    Not disclosed
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="job-summary-meta-item">
+                        <span class="job-summary-meta-icon"><i class="fa-solid fa-location-dot"></i></span>
+                        <div>
+                            <span class="job-summary-meta-label">Location</span>
+                            <div class="job-summary-meta-value">{{ job.location }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="job-summary-tags">
+                    <span class="job-summary-tag">
+                        <i class="fa-solid fa-building-user"></i>
+                        {% if job.industry_type %}
+                            {{ job.industry_type }}
+                        {% else %}
+                            Industry profile available in role details
+                        {% endif %}
+                    </span>
+                    <span class="job-summary-tag">
+                        <i class="fa-solid fa-clock"></i>
+                        {{ job.job_type }}
+                    </span>
+                    <span class="job-summary-tag">
+                        <i class="fa-solid fa-video"></i>
+                        {{ job.get_interview_type_display }}
+                    </span>
+                </div>
+            </div>
+
+            <aside class="job-summary-actions">
+                {% if existing_application %}
+                <a href="{% url 'dashboard' %}" class="btn job-primary-btn">
+                    Application {{ existing_application.status }}
+                </a>
+                {% else %}
+                <a href="{% url 'apply_job' job.id %}" class="btn job-primary-btn">
+                    Apply Now
+                </a>
+                {% endif %}
+
+                <form method="POST" action="{% url 'toggle_save_job_legacy' job.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                    <button type="submit" class="btn job-secondary-btn{% if job.is_saved %} saved{% endif %}">
+                        <i class="{% if job.is_saved %}fas{% else %}far{% endif %} fa-bookmark me-2"></i>
+                        {% if job.is_saved %}Saved Job ❤️{% else %}Save Job ❤️{% endif %}
+                    </button>
+                </form>
+
+                <a href="#role-details" class="btn job-outline-btn">
+                    View Role Details
+                </a>
+
+                <p class="job-summary-note">
+                    {% if existing_application %}
+                        You already applied to this role. Track the latest status from your dashboard.
+                    {% elif job_match %}
+                        Resume score {{ job_match.resume_score|floatformat:0 }}% and job match {{ job_match.match_percentage|floatformat:0 }}% based on your current profile.
+                    {% else %}
+                        Add a resume in your profile to unlock AI match scoring before you apply.
+                    {% endif %}
+                </p>
+            </aside>
+        </div>
+    </section>
+
+    <div class="job-detail-grid">
+        <div class="job-content-stack">
+            <section class="job-content-card">
+                <div class="job-section-header">
+                    <h2 class="job-section-title">Job Description</h2>
+                    <span class="job-section-marker">Overview</span>
+                </div>
+                <p class="job-section-copy">{{ job.description }}</p>
+            </section>
+
+            <section class="job-content-card">
+                <div class="job-section-header">
+                    <h2 class="job-section-title">Key Skills</h2>
+                    <span class="job-section-marker">Required Skills</span>
+                </div>
+
+                {% if job.get_skills_list %}
+                <div class="job-skills-grid">
+                    {% for skill in job.get_skills_list %}
+                    <span class="job-skill-chip">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="job-empty-note">No skills mentioned.</p>
+                {% endif %}
+            </section>
+
+            <section class="job-content-card" id="role-details">
+                <div class="job-section-header">
+                    <h2 class="job-section-title">Role Details</h2>
+                    <span class="job-section-marker">Professional Snapshot</span>
+                </div>
+
+                <div class="role-details-grid">
+                    {% for item in role_details %}
+                    <article class="role-detail-card">
+                        <span class="role-detail-label">{{ item.label }}</span>
+                        <p class="role-detail-value">{{ item.value }}</p>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="job-content-card">
+                <div class="job-section-header">
+                    <h2 class="job-section-title">Company Information</h2>
+                    <span class="job-section-marker">About Company</span>
+                </div>
+
+                <div class="job-company-box">
+                    <div class="job-company-logo">
+                        {% if job.company_logo %}
+                            <img src="{{ job.company_logo.url }}" alt="{{ job.company }} logo">
+                        {% else %}
+                            <span class="job-company-fallback">{{ job.company|slice:":1"|upper }}</span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h3 class="job-company-name">{{ job.company }}</h3>
+                        <p class="job-company-copy">
+                            {% if job.about_company %}
+                                {{ job.about_company }}
+                            {% else %}
+                                No company description available.
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <aside class="job-sidebar-stack">
+            <section class="job-sidebar-card">
+                <div class="job-section-header">
+                    <h2 class="job-section-title">Job Highlights</h2>
+                    <span class="job-section-marker">Quick Facts</span>
+                </div>
+
+                <div class="job-sidebar-list">
+                    <div class="job-sidebar-item">
+                        <span class="job-sidebar-icon"><i class="fa-solid fa-building-user"></i></span>
+                        <div>
+                            <strong>Industry Type</strong>
+                            <span>
+                                {% if job.industry_type %}
+                                    {{ job.industry_type }}
+                                {% else %}
+                                    Shown in role defaults
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="job-sidebar-item">
+                        <span class="job-sidebar-icon"><i class="fa-solid fa-sitemap"></i></span>
+                        <div>
+                            <strong>Department</strong>
+                            <span>
+                                {% if job.department %}
+                                    {{ job.department }}
+                                {% else %}
+                                    Available in role details
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="job-sidebar-item">
+                        <span class="job-sidebar-icon"><i class="fa-solid fa-graduation-cap"></i></span>
+                        <div>
+                            <strong>Education</strong>
+                            <span>
+                                {% if job.education %}
+                                    {{ job.education }}
+                                {% else %}
+                                    Check role details for qualification guidance
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="job-sidebar-item">
+                        <span class="job-sidebar-icon"><i class="fa-solid fa-chart-line"></i></span>
+                        <div>
+                            <strong>Activity</strong>
+                            <span>{{ job.views_count }} views | {{ job.website_clicks }} website clicks</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="job-sidebar-card">
+                <div class="job-section-header">
+                    <h2 class="job-section-title">Location</h2>
+                    <span class="job-section-marker">Office Preview</span>
+                </div>
+
+                <p class="job-section-copy">{{ job.company }} - {{ job.location }}</p>
+                <iframe
+                    class="job-map-frame"
+                    loading="lazy"
+                    aria-label="{{ job.company }} location map preview"
+                    src="https://maps.google.com/maps?q={{ job.company|urlencode }}+{{ job.location|urlencode }}&z=14&output=embed">
+                </iframe>
+
+                <a href="https://www.google.com/maps/search/?api=1&query={{ job.company|urlencode }}+{{ job.location|urlencode }}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="btn btn-outline-primary job-sidebar-link">
+                    Open in Google Maps
+                </a>
+
+                {% if job.company_website %}
+                <a href="{% url 'visit_company' job.id %}"
+                   target="_blank"
+                   class="btn btn-outline-dark job-sidebar-link">
+                    Visit Company Website
+                </a>
+                {% endif %}
+            </section>
+        </aside>
+    </div>
+
+    {% if similar_jobs %}
+    <section class="job-similar-wrap">
+        <div class="job-section-header">
+            <h2 class="job-section-title">Similar Jobs</h2>
+            <span class="job-section-marker">Related Openings</span>
+        </div>
+
+        <div class="job-similar-grid">
+            {% for similar in similar_jobs %}
+            <article class="job-similar-card">
+                <h3 class="job-similar-title">{{ similar.title }}</h3>
+                <div class="job-similar-meta">{{ similar.company }} | {{ similar.location }}</div>
+                <div class="job-similar-actions">
+                    <a href="{% url 'job_detail' similar.id %}" class="btn btn-primary">View Details</a>
+                    <form method="POST" action="{% url 'toggle_save_job' similar.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                        <button type="submit" class="btn btn-outline-primary{% if similar.is_saved %} saved{% endif %}">
+                            <i class="{% if similar.is_saved %}fas{% else %}far{% endif %} fa-bookmark me-1"></i>
+                            {% if similar.is_saved %}Saved{% else %}Save Job{% endif %}
+                        </button>
+                    </form>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

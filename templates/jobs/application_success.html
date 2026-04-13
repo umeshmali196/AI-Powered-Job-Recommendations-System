@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-body p-4 p-lg-5 text-center">
+                    <div class="display-6 mb-3">Application Submitted Successfully 🎉</div>
+                    <p class="lead text-muted mb-4">
+                        Your application for <strong>{{ application.job.title }}</strong> at <strong>{{ application.job.company }}</strong> has been saved.
+                    </p>
+
+                    <div class="row g-3 text-start mb-4">
+                        <div class="col-md-6">
+                            <div class="rounded-4 bg-light p-3 h-100">
+                                <div class="small text-uppercase text-muted fw-semibold mb-1">Current status</div>
+                                <div class="fw-bold">{{ application.status }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="rounded-4 bg-light p-3 h-100">
+                                <div class="small text-uppercase text-muted fw-semibold mb-1">AI role match</div>
+                                <div class="fw-bold">{{ application.match_percentage|floatformat:0 }}%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rounded-4 border p-4 mb-4 text-start">
+                        <h2 class="h5 mb-3">Next steps</h2>
+                        <ul class="mb-0">
+                            <li>HR review of your resume and profile fit</li>
+                            <li>Shortlisting for the screening and interview stages</li>
+                            <li>Email updates for interview scheduling, selection, or rejection</li>
+                        </ul>
+                    </div>
+
+                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                        <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg px-4">Go to Dashboard</a>
+                        <a href="{% url 'job_detail' application.job.id %}" class="btn btn-outline-secondary btn-lg px-4">Back to Job</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
